@@ -8,6 +8,9 @@ public class RecipeEntity
     public string? Image { get; set; }
     public List<IngredientEntity> Ingredients { get; set; }
 
+    public RecipeEntity()
+    { }
+
     public RecipeEntity(int id, string name, string? description, string? image, List<IngredientEntity> ingredients)
     {
         Id = id;

@@ -7,4 +7,6 @@ public interface ICrud
     Task CreateRecipeAsync(RecipeEntity recipe);
 
     Task<List<RecipeEntity>> GetRecipesAsync();
+
+    Task<RecipeEntity?> GetRecipeAsync(int id);
 }

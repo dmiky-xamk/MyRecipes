@@ -19,6 +19,13 @@ public class Crud : ICrud
         return await _db.QueryData<RecipeEntity, dynamic>(sql, new { });
     }
 
+    public async Task<RecipeEntity?> GetRecipeAsync(int id)
+    {
+        string sql = "SELECT * FROM Recipe WHERE Id = @Id";
+
+        return await _db.QueryDataSingle<RecipeEntity, dynamic>(sql, new { Id = id });
+    }
+
     public async Task CreateRecipeAsync(RecipeEntity recipe)
     {
         string sql = "INSERT INTO Recipe (Name, Description, Image)"

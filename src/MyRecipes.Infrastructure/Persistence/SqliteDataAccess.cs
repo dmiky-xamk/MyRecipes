@@ -36,7 +36,7 @@ internal class SqliteDataAccess : IDataAccess
         }
     }
 
-    public async Task<T> QueryDataSingle<T, U>(string sqlStatement, U parameters)
+    public async Task<T?> QueryDataSingle<T, U>(string sqlStatement, U parameters)
     {
         using (IDbConnection connection = new SQLiteConnection(_connectionString))
         {

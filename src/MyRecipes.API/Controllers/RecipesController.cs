@@ -7,18 +7,19 @@ namespace MyRecipes.API.Controllers;
 public class RecipesController : ApiBaseController
 {
     [HttpGet]
-    public async Task<IActionResult> GetActivities()
+    public async Task<IActionResult> GetRecipes()
     {
         var result = await Mediator.Send(new GetRecipes.Query());
 
         return HandleResult(result);
     }
 
-    // GET api/<RecipesController>/5
     [HttpGet("{id}")]
-    public string Get(int id)
+    public async Task<IActionResult> GetRecipe(int id)
     {
-        return "value";
+        var result = await Mediator.Send(new GetRecipe.Query { Id = id });
+
+        return HandleResult(result);
     }
 
     // POST api/<RecipesController>

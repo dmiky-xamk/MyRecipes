@@ -26,7 +26,7 @@ public class MappingTests
     }
 
     [Theory]
-    [InlineData(typeof(RecipeDto), typeof(RecipeDto))]
+    [InlineData(typeof(IngredientEntity), typeof(RecipeDto))]
     public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
     {
         var instance = GetInstanceOf(source);

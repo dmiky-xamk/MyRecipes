@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MyRecipes.Application.Ingredients;
 using MyRecipes.Application.Recipes.Queries.GetRecipes;
 using MyRecipes.Domain.Entities;
 
@@ -9,5 +10,6 @@ public class MappingProfiles : Profile
     public MappingProfiles()
     {
         CreateMap<RecipeEntity, RecipeDto>();
+        CreateMap<IngredientEntity, IngredientDto>();
     }
 }

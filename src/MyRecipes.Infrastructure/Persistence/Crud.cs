@@ -29,13 +29,18 @@ public class Crud : ICrud
     public async Task CreateRecipeAsync(RecipeEntity recipe)
     {
         string sql = "INSERT INTO Recipe (Name, Description, Image)"
-            + "VALUES (@Name, @Description, @Image)";
+            + " VALUES (@Name, @Description, @Image)";
 
         await _db.SaveData(sql, new { recipe.Name, recipe.Description, recipe.Image });
+        
+    }
 
-        sql = "INSERT INTO Ingredient (Name, Unit, Amount)"
-            + "VALUES (@Name, @Unit, @Amount)";
+    public async Task<List<IngredientEntity>> GetIngredientsAsync(int recipeId)
+    {
+        string sql = "SELECT i.* FROM Ingredient i"
+            + " INNER JOIN Recipe r "
+            + " ON r.Id = @RecipeId ";
 
-        await _db.SaveData(sql, recipe.Ingredients);
+        return await _db.QueryData<IngredientEntity, dynamic>(sql, new { RecipeId = recipeId });
     }
 }

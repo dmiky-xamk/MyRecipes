@@ -12,9 +12,20 @@ public abstract class ApiBaseController : ControllerBase
 
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
-    protected IActionResult HandleResult<T>(Result<T> result)
+    /// <summary>
+    /// Map the <paramref name="result"/> to an appropriate HTTP response.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="result"></param>
+    /// <returns>A HTTP response of type <typeparamref name="IActionResult"/>.</returns>
+    protected IActionResult HandleResult<T>(Result<T>? result)
     {
         if (result is null)
+        {
+            return NotFound();
+        }
+
+        if (result.IsSuccess && result.Value is null)
         {
             return NotFound();
         }
@@ -22,11 +33,6 @@ public abstract class ApiBaseController : ControllerBase
         if (result.IsSuccess && result.Value is not null)
         {
             return Ok(result.Value);
-        }
-
-        if (result.IsSuccess && result.Value is null)
-        {
-            return NotFound();
         }
 
         return BadRequest(result.Error);

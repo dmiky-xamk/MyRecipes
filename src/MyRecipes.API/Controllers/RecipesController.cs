@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MyRecipes.Application.Recipes.Commands.CreateRecipe;
 using MyRecipes.Application.Recipes.Queries.GetRecipes;
 
 namespace MyRecipes.API.Controllers;
@@ -22,10 +23,12 @@ public class RecipesController : ApiBaseController
         return HandleResult(result);
     }
 
-    // POST api/<RecipesController>
     [HttpPost]
-    public void Post([FromBody] string value)
+    public async Task<IActionResult> CreateRecipe([FromBody] RecipeVm recipe)
     {
+        var result = await Mediator.Send(new CreateRecipe.Command { Recipe = recipe });
+
+        return HandleResult(result);
     }
 
     // PUT api/<RecipesController>/5

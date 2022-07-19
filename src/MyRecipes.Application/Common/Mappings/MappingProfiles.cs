@@ -10,6 +10,8 @@ public class MappingProfiles : Profile
     public MappingProfiles()
     {
         CreateMap<RecipeEntity, RecipeDto>();
+        CreateMap<RecipeDto, RecipeEntity>();
         CreateMap<IngredientEntity, IngredientDto>();
+        CreateMap<IngredientDto, IngredientEntity>();
     }
 }

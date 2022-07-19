@@ -45,12 +45,22 @@ internal class SqliteDataAccess : IDataAccess
     }
 
     // WRITE
-    public async Task SaveData<T>(string sqlStatement, T parameters)
+    public async Task<int> SaveData<T>(string sqlStatement, T parameters)
     {
         // Dapper tallentaa (Execute) dataa tietokantaan.
         using (IDbConnection connection = new SQLiteConnection(_connectionString))
         {
-           await connection.ExecuteAsync(sqlStatement, parameters);
+            connection.Open();
+
+            await connection.ExecuteAsync(sqlStatement, parameters);
+
+            string sql = "SELECT last_insert_rowid();";
+
+            long lastInsertId = (long)await connection.ExecuteScalarAsync(sql);
+
+            connection.Close();
+
+            return (int)lastInsertId;
         }
     }
 }

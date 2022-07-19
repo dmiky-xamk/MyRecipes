@@ -63,4 +63,19 @@ internal class SqliteDataAccess : IDataAccess
             return (int)lastInsertId;
         }
     }
+
+    /// <summary>
+    /// Execute a SQL statement.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="sqlStatement"></param>
+    /// <param name="parameters"></param>
+    /// <returns>The number of rows affected.</returns>
+    public async Task<int> ExecuteStatement<T>(string sqlStatement, T parameters)
+    {
+        using (IDbConnection connection = new SQLiteConnection(_connectionString))
+        {
+            return await connection.ExecuteAsync(sqlStatement, parameters);
+        }
+    }
 }

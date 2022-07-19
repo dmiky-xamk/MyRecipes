@@ -9,4 +9,6 @@ public interface ICrud
     Task<List<IngredientEntity>> GetIngredientsAsync(int recipeId);
     Task<List<RecipeEntity>> GetRecipesAsync();
     Task<RecipeEntity?> GetRecipeAsync(int id);
+    Task<int> DeleteRecipeAsync(int id);
+
 }

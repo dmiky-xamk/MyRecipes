@@ -57,4 +57,17 @@ public class Crud : ICrud
 
         await _db.SaveData(sql, new { ingredient.RecipeId, ingredient.Name, ingredient.Unit, ingredient.Amount });
     }
+
+    /// <summary>
+    /// Delete a recipe along with its ingredients.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns>The number of rows affected.</returns>
+    public async Task<int> DeleteRecipeAsync(int id)
+    {
+        // Delete all the ingredients as well.
+        string sql = "PRAGMA foreign_keys=ON; DELETE FROM Recipe WHERE Id = @Id";
+
+        return await _db.ExecuteStatement(sql, new { Id = id });
+    }
 }

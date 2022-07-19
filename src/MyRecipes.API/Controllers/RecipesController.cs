@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyRecipes.Application.Recipes.Commands.CreateRecipe;
+using MyRecipes.Application.Recipes.Commands.DeleteRecipe;
 using MyRecipes.Application.Recipes.Queries.GetRecipes;
 
 namespace MyRecipes.API.Controllers;
@@ -31,15 +32,16 @@ public class RecipesController : ApiBaseController
         return HandleResult(result);
     }
 
-    // PUT api/<RecipesController>/5
     [HttpPut("{id}")]
     public void Put(int id, [FromBody] string value)
     {
     }
 
-    // DELETE api/<RecipesController>/5
     [HttpDelete("{id}")]
-    public void Delete(int id)
+    public async Task<IActionResult> DeleteRecipe(int id)
     {
+        var result = await Mediator.Send(new DeleteRecipe.Command { Id = id });
+
+        return HandleResult(result);
     }
 }

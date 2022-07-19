@@ -1,10 +1,14 @@
-﻿namespace MyRecipes.Api;
+﻿using FluentValidation.AspNetCore;
+
+namespace MyRecipes.Api;
 
 public static class ConfigureServices
 {
     public static IServiceCollection AddAPIServices(this IServiceCollection services)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddFluentValidation();
+
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 

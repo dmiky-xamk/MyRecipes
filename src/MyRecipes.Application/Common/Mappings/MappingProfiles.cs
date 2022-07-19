@@ -10,8 +10,17 @@ public class MappingProfiles : Profile
     public MappingProfiles()
     {
         CreateMap<RecipeEntity, RecipeDto>();
-        CreateMap<RecipeDto, RecipeEntity>();
+
+        // Ignore the id (will be created by the db).
+        CreateMap<RecipeDto, RecipeEntity>()
+            .ForMember(d => d.Id, opt => opt.Ignore());
+
         CreateMap<IngredientEntity, IngredientDto>();
-        CreateMap<IngredientDto, IngredientEntity>();
+
+        // Ignore the id (will be created by the db).
+        // Ignore the RecipeId (will be created after mapping).
+        CreateMap<IngredientDto, IngredientEntity>()
+            .ForMember(d => d.Id, opt => opt.Ignore())
+            .ForMember(d => d.RecipeId, opt => opt.Ignore());
     }
 }

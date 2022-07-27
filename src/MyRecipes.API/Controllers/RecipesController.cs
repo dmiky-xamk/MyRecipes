@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MyRecipes.Application.Recipes;
 using MyRecipes.Application.Recipes.Commands.CreateRecipe;
 using MyRecipes.Application.Recipes.Commands.DeleteRecipe;
 using MyRecipes.Application.Recipes.Queries.GetRecipes;
 
 namespace MyRecipes.API.Controllers;
-
 
 public class RecipesController : ApiBaseController
 {
@@ -17,7 +17,7 @@ public class RecipesController : ApiBaseController
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetRecipe(int id)
+    public async Task<IActionResult> GetRecipe(string id)
     {
         var result = await Mediator.Send(new GetRecipe.Query { Id = id });
 
@@ -25,7 +25,7 @@ public class RecipesController : ApiBaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateRecipe([FromBody] RecipeVm recipe)
+    public async Task<IActionResult> CreateRecipe([FromBody] RecipeDto recipe)
     {
         var result = await Mediator.Send(new CreateRecipe.Command { Recipe = recipe });
 
@@ -33,12 +33,15 @@ public class RecipesController : ApiBaseController
     }
 
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    public async Task<IActionResult> UpdateRecipe([FromBody] RecipeDto recipe, string id)
     {
+        var result = await Mediator.Send(new UpdateRecipe.Command { Recipe = recipe, Id = id });
+
+        return HandleResult(result);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteRecipe(int id)
+    public async Task<IActionResult> DeleteRecipe(string id)
     {
         var result = await Mediator.Send(new DeleteRecipe.Command { Id = id });
 

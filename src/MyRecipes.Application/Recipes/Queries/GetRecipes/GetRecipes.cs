@@ -7,12 +7,12 @@ namespace MyRecipes.Application.Recipes.Queries.GetRecipes;
 
 public class GetRecipes
 {
-    public class Query : IRequest<Result<List<RecipeDto>>>
+    public class Query : IRequest<Result<IEnumerable<QueryRecipeDto>>>
     {
 
     }
 
-    public class Handler : IRequestHandler<Query, Result<List<RecipeDto>>>
+    public class Handler : IRequestHandler<Query, Result<IEnumerable<QueryRecipeDto>>>
     {
         private readonly ICrud _db;
         private readonly IMapper _mapper;
@@ -23,13 +23,13 @@ public class GetRecipes
             _mapper = mapper;
         }
 
-        public async Task<Result<List<RecipeDto>>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<QueryRecipeDto>>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var recipes = (await _db.GetRecipesAsync())
-                .Select(recipe => _mapper.Map<RecipeDto>(recipe))
-                .ToList();
+            var recipes = (await _db.GetFullRecipesAsync())
+                .Select(recipe => _mapper.Map<QueryRecipeDto>(recipe));
 
-            return Result<List<RecipeDto>>.Success(recipes);
+            // Returning an empty list is fine, the user just hasn't made any recipes yet.
+            return Result<IEnumerable<QueryRecipeDto>>.Success(recipes);
         }
     }
 }

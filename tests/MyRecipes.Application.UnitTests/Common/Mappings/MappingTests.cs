@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MyRecipes.Application.Common.Mappings;
-using MyRecipes.Application.Recipes.Queries.GetRecipes;
+using MyRecipes.Application.Recipes;
 using MyRecipes.Domain.Entities;
 using System.Runtime.Serialization;
 

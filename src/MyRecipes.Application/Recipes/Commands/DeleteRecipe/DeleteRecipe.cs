@@ -8,7 +8,7 @@ public class DeleteRecipe
 {
     public class Command : IRequest<Result<Unit>>
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = string.Empty;
     }
 
     public class Handler : IRequestHandler<Command, Result<Unit>>

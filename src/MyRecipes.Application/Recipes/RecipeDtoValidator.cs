@@ -1,14 +1,13 @@
 ﻿using FluentValidation;
-using MyRecipes.Application.Recipes.Queries.GetRecipes;
 
-namespace MyRecipes.Application.Recipes.Commands.CreateRecipe;
+namespace MyRecipes.Application.Recipes;
 
-public class CreateRecipeValidator :
-    AbstractValidator<RecipeVm>
+public class RecipeDtoValidator :
+    AbstractValidator<RecipeDto>
 {
-    public CreateRecipeValidator()
+    public RecipeDtoValidator()
     {
-        RuleFor(rec => rec.Recipe.Name)
+        RuleFor(rec => rec.Name)
             .NotEmpty()
             .WithMessage("The recipe name is required.")
             .MaximumLength(40)

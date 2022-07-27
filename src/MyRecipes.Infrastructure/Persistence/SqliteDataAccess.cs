@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using MyRecipes.Application.Common.Interfaces;
+using MyRecipes.Domain.Entities;
 using System.Data;
 using System.Data.SQLite;
 
@@ -20,16 +21,48 @@ internal class SqliteDataAccess : IDataAccess
         _connectionString = _config.GetConnectionString("Default");
     }
 
-    public async Task<List<T>> QueryData<T, U>(string sqlStatement, U parameters)
+    /// <summary>
+    /// Queries the database for recipes along with their ingredients.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="sqlStatement"></param>
+    /// <param name="parameters"></param>
+    /// <returns>An IEnumerable of the recipes that matched the parameters.</returns>
+    public async Task<IEnumerable<RecipeEntity>> QueryRecipes<T>(string sqlStatement, T parameters)
     {
-        // Luodaan yhteys connectionStringin osoittamaan SQL tietokantaan 'using' statementissa varmistaakseen yhteyden varmasti sulkeutuvan.
-        // Haetaan (Query) tietokannasta dataa argumenttien perusteella.
-        // Dapper palauttaa tiedot modeleina.
+        // TODO: Create RecipeDataAccess?
         using (IDbConnection connection = new SQLiteConnection(_connectionString))
         {
-            // <T>: Model
-            // sqlStatement: SELECT * Contacts...
-            // paremeters: Limiters (id...)
+            // All the recipes to return along with their ingredients will be added here.
+            var recipeDictionary = new Dictionary<string, RecipeEntity>();
+
+            var recipes = await connection.QueryAsync<RecipeEntity, IngredientEntity, RecipeEntity>(sqlStatement, (recipe, ingredient) =>
+            {
+                if (recipeDictionary.TryGetValue(recipe.Id, out RecipeEntity? existingRecipe))
+                {
+                    recipe = existingRecipe;
+                }
+
+                else
+                {
+                    recipeDictionary.Add(recipe.Id, recipe);
+                }
+
+                recipe.Ingredients.Add(ingredient);
+
+                return recipe;
+            },
+            splitOn: "Id",
+            param: parameters);
+
+            return recipeDictionary.Values;
+        }
+    }
+
+    public async Task<List<T>> QueryData<T, U>(string sqlStatement, U parameters)
+    {
+        using (IDbConnection connection = new SQLiteConnection(_connectionString))
+        {
             List<T> rows = (await connection.QueryAsync<T>(sqlStatement, parameters)).ToList();
 
             return rows;
@@ -41,26 +74,6 @@ internal class SqliteDataAccess : IDataAccess
         using (IDbConnection connection = new SQLiteConnection(_connectionString))
         {
             return await connection.QueryFirstOrDefaultAsync<T>(sqlStatement, parameters);
-        }
-    }
-
-    // WRITE
-    public async Task<int> SaveData<T>(string sqlStatement, T parameters)
-    {
-        // Dapper tallentaa (Execute) dataa tietokantaan.
-        using (IDbConnection connection = new SQLiteConnection(_connectionString))
-        {
-            connection.Open();
-
-            await connection.ExecuteAsync(sqlStatement, parameters);
-
-            string sql = "SELECT last_insert_rowid();";
-
-            long lastInsertId = (long)await connection.ExecuteScalarAsync(sql);
-
-            connection.Close();
-
-            return (int)lastInsertId;
         }
     }
 

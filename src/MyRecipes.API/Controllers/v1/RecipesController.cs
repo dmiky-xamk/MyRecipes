@@ -4,8 +4,10 @@ using MyRecipes.Application.Recipes.Commands.CreateRecipe;
 using MyRecipes.Application.Recipes.Commands.DeleteRecipe;
 using MyRecipes.Application.Recipes.Queries.GetRecipes;
 
-namespace MyRecipes.API.Controllers;
+namespace MyRecipes.API.Controllers.v1;
 
+[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("1.0")]
 public class RecipesController : ApiBaseController
 {
     [HttpGet]

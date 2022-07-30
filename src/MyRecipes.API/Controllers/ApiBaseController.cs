@@ -4,7 +4,6 @@ using MyRecipes.Application.Common.Models;
 
 namespace MyRecipes.API.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
 public abstract class ApiBaseController : ControllerBase
 {

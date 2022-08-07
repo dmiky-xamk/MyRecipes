@@ -104,6 +104,7 @@ public static class ConfigureServices
             });
 
         services.AddScoped<ApplicationDbContextInitializer>();
+        services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddScoped<ITokenService, TokenService>();
 
         return services;

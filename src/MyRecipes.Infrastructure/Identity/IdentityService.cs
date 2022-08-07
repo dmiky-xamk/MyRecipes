@@ -48,7 +48,7 @@ public class IdentityService : IIdentityService
 
         if (result.Succeeded)
         {
-            return IdentificationResult<IdentificationError>.Success(IdentificationError.None);
+            return IdentificationResult<IdentificationError>.Success(IdentificationError.None, appUser.Id);
         }
 
         return IdentificationResult<IdentificationError>.Failure(
@@ -68,10 +68,10 @@ public class IdentityService : IIdentityService
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
+        
         if (result.Succeeded)
         {
-            return IdentificationResult<IdentificationError>.Success(IdentificationError.None);
+            return IdentificationResult<IdentificationError>.Success(IdentificationError.None, user.Id);
         }
 
         return IdentificationResult<IdentificationError>.Failure(IdentificationError.WrongCredentials);

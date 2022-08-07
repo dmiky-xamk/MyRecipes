@@ -29,7 +29,7 @@ public class RegisterUser
 
             if (result.IsSuccess)
             {
-                string token = _tokenService.GenerateToken(request.RegisterDto.Username);
+                string token = _tokenService.GenerateToken(request.RegisterDto.Username, result.UserId);
 
                 return IdentificationResult<string>.Success(token);
             }

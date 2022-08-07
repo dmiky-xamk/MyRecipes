@@ -19,22 +19,21 @@ public class IdentificationResult<T> : BaseResult<T>
 {
     public IdentificationError IdentityError { get; set; }
     public (string, string) ErrorState { get; set; }
+    public string UserId { get; set; } = string.Empty;
 
-    public static IdentificationResult<T> Success(T value)
+    public static IdentificationResult<T> Success(T value, string userId = "")
     {
         return new()
         {
             IsSuccess = true,
+            UserId = userId,
             Value = value 
         };
     }
 
     public static IdentificationResult<T> Failure(IdentificationError error)
     {
-        return new()
-        {
-            IdentityError = error
-        };
+        return Failure(error, string.Empty);
     }
 
     public static IdentificationResult<T> Failure(IdentificationError error, string errorMessage) 

@@ -4,6 +4,7 @@ using MyRecipes.Application.Common.Models;
 
 namespace MyRecipes.Application.Users.Queries.LoginUser;
 
+// TODO: Move to commands
 public class LoginUser
 {
     public class Query : IRequest<IdentificationResult<string>>
@@ -28,7 +29,7 @@ public class LoginUser
 
             if (result.IsSuccess)
             {
-                string token = _tokenService.GenerateToken(request.LoginDto.Username);
+                string token = _tokenService.GenerateToken(request.LoginDto.Username, result.UserId);
 
                 return IdentificationResult<string>.Success(token);
             }

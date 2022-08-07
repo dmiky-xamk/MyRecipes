@@ -34,10 +34,10 @@ public class Crud : ICrud
 
     public async Task<int> CreateRecipeAsync(RecipeEntity recipe)
     {
-        string sql = "INSERT INTO Recipe (Id, Name, Description, Image)" +
-                    " VALUES (@Id, @Name, @Description, @Image);";
+        string sql = "INSERT INTO Recipe (Id, UserId, Name, Description, Image)" +
+                    " VALUES (@Id, @UserId, @Name, @Description, @Image);";
 
-        return await _db.ExecuteStatement(sql, new { recipe.Id, recipe.Name, recipe.Description, recipe.Image });
+        return await _db.ExecuteStatement(sql, new { recipe.Id, recipe.UserId, recipe.Name, recipe.Description, recipe.Image });
     }
     
     public async Task CreateIngredientsAsync(IEnumerable<IngredientEntity> ingredients)

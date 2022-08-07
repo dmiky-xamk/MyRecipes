@@ -19,12 +19,14 @@ public class CreateRecipe
         private readonly ICrud _db;
         private readonly IMapper _mapper;
         private readonly IIdGenerator<long> _idGen;
+        private readonly ICurrentUserService _userService;
 
-        public Handler(ICrud db, IMapper mapper, IIdGenerator<long> idGen)
+        public Handler(ICrud db, IMapper mapper, IIdGenerator<long> idGen, ICurrentUserService userService)
         {
             _db = db;
             _mapper = mapper;
             _idGen = idGen;
+            _userService = userService;
         }
 
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -32,10 +34,14 @@ public class CreateRecipe
             // Create the recipe Snowflake Id
             long recipeId = _idGen.CreateId();
 
+            // TODO: Link the User GUID to the recipe
+            var userId = _userService.UserId;
+
             RecipeEntity recipe = _mapper.Map<RecipeEntity>(request.Recipe,
                 opt =>
                 {
                     opt.Items["RecipeId"] = recipeId;
+                    opt.Items["UserId"] = userId;
                 });
 
             int affectedRows = await _db.CreateRecipeAsync(recipe);

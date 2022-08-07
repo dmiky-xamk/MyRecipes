@@ -3,6 +3,7 @@
 public class RecipeEntity
 {
     public string Id { get; set; } = default!;
+    public string UserId { get; set; } = string.Empty;
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public string? Image { get; set; }

@@ -1,6 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MyRecipes.Application.Common.Enums;
 using MyRecipes.Application.Common.Models;
+using MyRecipes.Application.Users;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace MyRecipes.API.Controllers;
 
@@ -35,5 +38,33 @@ public abstract class ApiBaseController : ControllerBase
         }
 
         return BadRequest(result.Error);
+    }
+
+    protected ActionResult<string> HandleIdentityResult<T>(IdentificationResult<T> result)
+    {
+        // Unauthorized (user not found during login, credentials are wrong)
+        // Bad Request (unknown error during registration)
+        // ValidationProblem (credentials already in use)
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        // TODO: Refactor?
+        switch (result.IdentityError)
+        {
+            case IdentificationError.UsernameTaken:
+            case IdentificationError.EmailTaken:
+                ModelState.AddModelError(result.ErrorState.Item1, result.ErrorState.Item2);
+                return ValidationProblem(ModelState);
+
+            case IdentificationError.WrongCredentials:
+            case IdentificationError.UserNotFound:
+                return Unauthorized();
+
+            case IdentificationError.UnknownError:
+            default:
+                return BadRequest(result.Error);
+        }
     }
 }

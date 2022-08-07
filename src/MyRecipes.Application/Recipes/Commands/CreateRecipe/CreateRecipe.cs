@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using FluentValidation;
 using IdGen;
 using MediatR;
 using MyRecipes.Application.Common.Interfaces;

@@ -15,6 +15,8 @@ public class MappingProfiles : Profile
         CreateMap<RecipeDto, RecipeEntity>()
             .ForMember(d => d.Id, opt =>
             opt.MapFrom((_, _, _, context) => context.Items["RecipeId"]))
+            .ForMember(d => d.UserId, opt =>
+            opt.MapFrom((_, _, _, context) => context.Items["UserId"]))
             .ReverseMap();
 
         // Ignore the id (will be created by the db).

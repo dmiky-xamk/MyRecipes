@@ -1,11 +1,19 @@
 ﻿using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MyRecipes.API.Services;
+using MyRecipes.Application.Common.Interfaces;
+using MyRecipes.Infrastructure.Identity;
+using MyRecipes.Infrastructure.Persistence;
+using System.Text;
 
 namespace MyRecipes.Api;
 
 public static class ConfigureServices
 {
-    public static IServiceCollection AddAPIServices(this IServiceCollection services)
+    public static IServiceCollection AddAPIServices(this IServiceCollection services, ConfigurationManager config)
     {
         services.AddControllers()
             .AddFluentValidation();
@@ -13,6 +21,8 @@ public static class ConfigureServices
         services.ConfigureAPIVersioning();
         services.ConfigureSwaggerVersioning();
         services.ConfigureSwaggerPage();
+
+        services.ConfigureAuthentication(config);
 
         services.AddEndpointsApiExplorer();
 
@@ -62,4 +72,38 @@ public static class ConfigureServices
         return services;
     }
 
+    private static IServiceCollection ConfigureAuthentication(this IServiceCollection services, ConfigurationManager config)
+    {
+        services.AddIdentityCore<ApplicationUser>(opt =>
+        {
+            opt.Password.RequireNonAlphanumeric = false;
+        })
+         .AddEntityFrameworkStores<ApplicationDbContext>()
+         //.AddUserManager<UserManager<ApplicationUser>>()
+         .AddSignInManager<SignInManager<ApplicationUser>>();
+
+        // Allow the user to send the token back to us.
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(opt =>
+            {
+                opt.TokenValidationParameters = new()
+                {
+                    // What fields to validate in the token.
+                    ValidateIssuerSigningKey = true,
+                    ValidateAudience = true,
+                    ValidateIssuer = true,
+
+                    // Validate the token against these values.
+                    ValidIssuer = config.GetValue<string>("Authentication:Issuer"),
+                    ValidAudience = config.GetValue<string>("Authentication:Audience"),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                        config.GetValue<string>("Authentication:SecretKey")))
+                };
+            });
+
+        services.AddScoped<ApplicationDbContextInitializer>();
+        services.AddScoped<ITokenService, TokenService>();
+
+        return services;
+    }
 }

@@ -14,6 +14,7 @@ public static class ConfigureServices
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddMediatR(Assembly.GetExecutingAssembly());
 
+        // For generating IDs for the recipes.
         services.AddIdGen(1);
 
         return services;

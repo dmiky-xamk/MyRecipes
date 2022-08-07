@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyRecipes.Application.Users;
 using MyRecipes.Application.Users.Commands.RegisterUser;
 using MyRecipes.Application.Users.Queries.LoginUser;
 
 namespace MyRecipes.API.Controllers.v1;
+
+// So that the user can register / login.
+[AllowAnonymous]
 
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiVersion("1.0")]

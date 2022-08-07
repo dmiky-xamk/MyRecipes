@@ -1,5 +1,6 @@
 ﻿using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -23,6 +24,7 @@ public static class ConfigureServices
         services.ConfigureSwaggerPage();
 
         services.ConfigureAuthentication(config);
+        services.ConfigureAuthorization();
 
         services.AddEndpointsApiExplorer();
 
@@ -79,10 +81,10 @@ public static class ConfigureServices
             opt.Password.RequireNonAlphanumeric = false;
         })
          .AddEntityFrameworkStores<ApplicationDbContext>()
-         //.AddUserManager<UserManager<ApplicationUser>>()
          .AddSignInManager<SignInManager<ApplicationUser>>();
 
         // Allow the user to send the token back to us.
+        // The token is sent back in the 'Authorization' header.
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(opt =>
             {
@@ -103,6 +105,19 @@ public static class ConfigureServices
 
         services.AddScoped<ApplicationDbContextInitializer>();
         services.AddScoped<ITokenService, TokenService>();
+
+        return services;
+    }
+
+    private static IServiceCollection ConfigureAuthorization(this IServiceCollection services)
+    {
+        // Require an authenticated user to access the endpoints.
+        services.AddAuthorization(opt =>
+        {
+            opt.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+        });
 
         return services;
     }

@@ -23,7 +23,7 @@ public interface ICrud
     /// </summary>
     /// <param name="id"></param>
     /// <returns>The number of rows affected.</returns>
-    Task<int> DeleteRecipeAsync(string id);
+    Task<int> DeleteRecipeAsync(string id, string userId);
 
     // Deprecated?
     //Task<List<IngredientEntity>> GetIngredientsAsync(string recipeId);

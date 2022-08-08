@@ -67,12 +67,14 @@ public class Crud : ICrud
         await CreateIngredientsAsync(ingredients);
     }
 
-    public async Task<int> DeleteRecipeAsync(string id)
+    public async Task<int> DeleteRecipeAsync(string id, string userId)
     {
         // Delete all the ingredients as well.
-        string sql = "PRAGMA foreign_keys=ON; DELETE FROM Recipe WHERE Id = @Id";
+        string sql = "PRAGMA foreign_keys=ON; " +
+                    " DELETE FROM Recipe " +
+                    " WHERE Id = @Id AND UserId = @UserId";
 
-        return await _db.ExecuteStatement(sql, new { Id = id });
+        return await _db.ExecuteStatement(sql, new { Id = id, UserId = userId });
     }
 
     // TODO: Are these required anymore?

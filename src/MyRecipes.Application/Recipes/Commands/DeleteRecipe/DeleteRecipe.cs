@@ -14,15 +14,19 @@ public class DeleteRecipe
     public class Handler : IRequestHandler<Command, Result<Unit>>
     {
         private readonly ICrud _db;
+        private readonly ICurrentUserService _userService;
 
-        public Handler(ICrud db)
+        public Handler(ICrud db, ICurrentUserService userService)
         {
             _db = db;
+            _userService = userService;
         }
 
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
-            int affectedRows = await _db.DeleteRecipeAsync(request.Id);
+            string userId = _userService.UserId!;
+
+            int affectedRows = await _db.DeleteRecipeAsync(request.Id, userId);
 
             if (affectedRows == 0)
             {

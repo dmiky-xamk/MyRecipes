@@ -22,14 +22,14 @@ public class Crud : ICrud
         return await _db.QueryRecipes<dynamic>(sql, new { UserId = userId });
     }
 
-    public async Task<RecipeEntity?> GetFullRecipeAsync(string recipeId)
+    public async Task<RecipeEntity?> GetFullRecipeAsync(string recipeId, string userId)
     {
-        string sql = "SELECT r.Id, r.Name, r.Description, i.Id, i.RecipeId, i.Name, i.Unit, i.Amount" +
+        string sql = "SELECT r.Id, r.UserId, r.Name, r.Description, r.Image, i.Id, i.RecipeId, i.Name, i.Unit, i.Amount" +
                     " FROM Recipe r" +
                     " INNER JOIN Ingredient i on i.RecipeId = r.Id" +
-                    " WHERE i.RecipeId = @RecipeId";
+                    " WHERE i.RecipeId = @RecipeId AND r.UserId = @UserId";
 
-        return (await _db.QueryRecipes<dynamic>(sql, new { RecipeId = recipeId }))
+        return (await _db.QueryRecipes<dynamic>(sql, new { RecipeId = recipeId, UserId = userId }))
             .FirstOrDefault();
     }
 

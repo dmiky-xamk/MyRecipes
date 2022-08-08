@@ -13,7 +13,7 @@ public interface ICrud
     Task<int> CreateRecipeAsync(RecipeEntity recipe);
 
     Task<IEnumerable<RecipeEntity>> GetFullRecipesAsync(string userId);
-    Task<RecipeEntity?> GetFullRecipeAsync(string recipeId);
+    Task<RecipeEntity?> GetFullRecipeAsync(string recipeId, string userId);
 
     Task<int> UpdateRecipeAsync(RecipeEntity recipe);
     Task UpdateIngredientsAsync(IEnumerable<IngredientEntity> ingredients);

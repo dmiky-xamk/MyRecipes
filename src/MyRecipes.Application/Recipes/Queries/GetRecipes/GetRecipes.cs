@@ -16,16 +16,20 @@ public class GetRecipes
     {
         private readonly ICrud _db;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _userService;
 
-        public Handler(ICrud db, IMapper mapper)
+        public Handler(ICrud db, IMapper mapper, ICurrentUserService userService)
         {
             _db = db;
             _mapper = mapper;
+            _userService = userService;
         }
 
         public async Task<Result<IEnumerable<QueryRecipeDto>>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var recipes = (await _db.GetFullRecipesAsync())
+            string userId = _userService.UserId!;
+
+            var recipes = (await _db.GetFullRecipesAsync(userId))
                 .Select(recipe => _mapper.Map<QueryRecipeDto>(recipe));
 
             // Returning an empty list is fine, the user just hasn't made any recipes yet.

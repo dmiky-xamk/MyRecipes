@@ -12,13 +12,14 @@ public class Crud : ICrud
        _db = db;
     }
 
-    public async Task<IEnumerable<RecipeEntity>> GetFullRecipesAsync()
+    public async Task<IEnumerable<RecipeEntity>> GetFullRecipesAsync(string userId)
     {
-        string sql = "SELECT r.Id, r.Name, r.Description, i.Id, i.RecipeId, i.Name, i.Unit, i.Amount" +
+        string sql = "SELECT r.Id, r.UserId, r.Name, r.Description, r.Image, i.Id, i.RecipeId, i.Name, i.Unit, i.Amount" +
                     " FROM Recipe r" +
-                    " INNER JOIN Ingredient i on i.RecipeId = r.Id";
+                    " INNER JOIN Ingredient i on i.RecipeId = r.Id" +
+                    " WHERE r.UserId = @UserId";
 
-        return await _db.QueryRecipes<dynamic>(sql, new { });
+        return await _db.QueryRecipes<dynamic>(sql, new { UserId = userId });
     }
 
     public async Task<RecipeEntity?> GetFullRecipeAsync(string recipeId)

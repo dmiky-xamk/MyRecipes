@@ -30,7 +30,7 @@ public class DeleteRecipe
 
             if (affectedRows == 0)
             {
-                return Result<Unit>.Failure("Failed to delete a recipe with the given ID");
+                return Result<Unit>.Failure("Failed to delete a recipe with the given ID.");
             }
 
             return Result<Unit>.Success(Unit.Value);

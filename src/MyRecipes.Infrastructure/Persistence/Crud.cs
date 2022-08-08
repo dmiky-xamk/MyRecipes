@@ -52,9 +52,9 @@ public class Crud : ICrud
     public async Task<int> UpdateRecipeAsync(RecipeEntity recipe)
     {
         string sql = "UPDATE Recipe SET Name = @Name, Description = @Description, Image = @Image" +
-                    " WHERE Id = @Id";
+                    " WHERE Id = @Id AND UserId = @UserId";
 
-        return await _db.ExecuteStatement(sql, new { recipe.Id, recipe.Name, recipe.Description, recipe.Image });
+        return await _db.ExecuteStatement(sql, new { recipe.Id, recipe.UserId, recipe.Name, recipe.Description, recipe.Image });
     }
     
     public async Task UpdateIngredientsAsync(IEnumerable<IngredientEntity> ingredients)

@@ -20,19 +20,24 @@ public class UpdateRecipe
     {
         private readonly ICrud _db;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _userService;
 
-        public Handler(ICrud db, IMapper mapper)
+        public Handler(ICrud db, IMapper mapper, ICurrentUserService userService)
         {
             _db = db;
             _mapper = mapper;
+            _userService = userService;
         }
 
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
+            string userId = _userService.UserId!;
+
             RecipeEntity recipe = _mapper.Map<RecipeEntity>(request.Recipe,
                 opt =>
                 {
                     opt.Items["RecipeId"] = request.Id;
+                    opt.Items["UserId"] = userId;
                 });
 
             var affectedRows = await _db.UpdateRecipeAsync(recipe);

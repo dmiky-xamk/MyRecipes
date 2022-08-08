@@ -34,8 +34,7 @@ public class CreateRecipe
             // Create the recipe Snowflake Id
             long recipeId = _idGen.CreateId();
 
-            // TODO: Link the User GUID to the recipe
-            var userId = _userService.UserId;
+            string userId = _userService.UserId!;
 
             RecipeEntity recipe = _mapper.Map<RecipeEntity>(request.Recipe,
                 opt =>

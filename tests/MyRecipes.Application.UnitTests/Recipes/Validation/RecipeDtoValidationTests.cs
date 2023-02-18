@@ -1,4 +1,5 @@
 ﻿using FluentValidation.TestHelper;
+using MyRecipes.Application.Features.Recipes;
 using MyRecipes.Application.Ingredients;
 using MyRecipes.Application.Recipes;
 
@@ -18,14 +19,10 @@ public class RecipeDtoValidationTests
     {
         List<IngredientDto> ingredients = new()
         {
-            new IngredientDto() { Name = "Flour", Unit = "dl", Amount = 4 }
+            new IngredientDto("Flour", "dl", 4)
         };
 
-        var recipe = new RecipeDto
-        {
-            Name = string.Empty,
-            Ingredients = ingredients
-        };
+        var recipe = new RecipeDto(string.Empty, string.Empty, string.Empty, ingredients);
 
         var result = _validator.TestValidate(recipe);
 
@@ -37,14 +34,11 @@ public class RecipeDtoValidationTests
     {
         List<IngredientDto> ingredients = new()
         {
-            new IngredientDto() { Name = string.Empty, Unit = "dl", Amount = 4 }
+            new IngredientDto(string.Empty, "dl", 4)
         };
 
-        var recipe = new RecipeDto
-        {
-            Name = "Pancakes",
-            Ingredients = ingredients
-        };
+        var recipe = new RecipeDto("Test", string.Empty, string.Empty, ingredients);
+
 
         var result = _validator.TestValidate(recipe);
 

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MyRecipes.Application.Users;
-using MyRecipes.Application.Users.Commands.RegisterUser;
-using MyRecipes.Application.Users.Queries.LoginUser;
+using MyRecipes.Application.Features.Auth.Login;
+using MyRecipes.Application.Features.Auth.Register;
 
 namespace MyRecipes.API.Controllers.v1;
 
@@ -13,6 +12,13 @@ namespace MyRecipes.API.Controllers.v1;
 [ApiVersion("1.0")]
 public class AccountController : ApiBaseController
 {
+    /// <summary>
+    /// Logs the User in.
+    /// </summary>
+    /// <returns>A JWT token.</returns>
+    /// <response code="200">The login was succesful</response>
+    /// <response code="400">An unknown error happened</response>   
+    /// <response code="401">The credentials are invalid</response>   
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login(LoginDto loginDto)
     {
@@ -21,6 +27,15 @@ public class AccountController : ApiBaseController
         return HandleIdentityResult(result);
     }
 
+    /// <summary>
+    /// Registers a new User.
+    /// </summary>
+    /// <returns>A JWT token.</returns>
+    /// <response code="200">The registration was succesful</response>
+    /// <response code="400">The credentials are already in use</response>   
+    /// <response code="400">The credentials are invalid</response>   
+    /// <response code="400">An unknown error happened</response>   
+    /// <response code="401">The user is not authorized</response>  
     [HttpPost("register")]
     public async Task<ActionResult<string>> Register(RegisterDto registerDto)
     {

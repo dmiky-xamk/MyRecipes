@@ -11,6 +11,10 @@
 *.sln.docstates
 appsettings.json
 
+# Ignore the projects after refactoring the architecture
+MyRecipes.Domain/
+MyRecipes.Infrastructure/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

@@ -1,4 +1,4 @@
-﻿using MyRecipes.Application.Common.Enums;
+﻿using MyRecipes.Application.Infrastructure.Identity;
 
 namespace MyRecipes.Application.Common.Models;
 

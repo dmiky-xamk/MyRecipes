@@ -2,12 +2,15 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MyRecipes.API.Services;
-using MyRecipes.Application.Common.Interfaces;
+using MyRecipes.API;
+using MyRecipes.API.Features.Auth;
+using MyRecipes.Application.Features.Auth;
 using MyRecipes.Infrastructure.Identity;
 using MyRecipes.Infrastructure.Persistence;
+using System.Reflection;
 using System.Text;
 
 namespace MyRecipes.Api;
@@ -58,6 +61,8 @@ public static class ConfigureServices
 
     private static IServiceCollection ConfigureSwaggerPage(this IServiceCollection services)
     {
+        // Configure Swagger UI to represent the API more clearly.
+        // https://code-maze.com/swagger-ui-asp-net-core-web-api/
         services.AddSwaggerGen(opt =>
         {
             var title = "My Recipes API";
@@ -69,6 +74,26 @@ public static class ConfigureServices
                 Title = $"{title} v1",
                 Description = description
             });
+
+            // Enable XML comments to document the API endpoints.
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            opt.IncludeXmlComments(xmlPath);
+
+            // Add authentication to Swagger UI.
+            // https://stackoverflow.com/questions/56234504/bearer-authentication-in-swagger-ui-when-migrating-to-swashbuckle-aspnetcore-ve
+            opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT Authorization using the Bearer scheme.",
+                Type = SecuritySchemeType.Http,
+                Scheme = JwtBearerDefaults.AuthenticationScheme,
+                In = ParameterLocation.Header,
+            });
+
+            // Add authentication only to the endpoints that require it.
+            // Excludes 'AllowAnonymous' endpoints --> login & register
+            // https://stackoverflow.com/questions/59158352/swagger-ui-authentication-only-for-some-endpoints
+            opt.OperationFilter<SecurityRequirementsOperationFilter>();
         });
 
         return services;

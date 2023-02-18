@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MyRecipes.Application.Common.Enums;
 using MyRecipes.Application.Common.Models;
 using MyRecipes.Application.Users;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using MyRecipes.Application.Infrastructure.Identity;
 
 namespace MyRecipes.API.Controllers;
 

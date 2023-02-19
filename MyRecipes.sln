@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyRecipes.Application.UnitT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyRecipes.Application.IntegrationTests", "tests\MyRecipes.Application.IntegrationTests\MyRecipes.Application.IntegrationTests.csproj", "{9CBE46C7-7DED-4E36-9FF6-8A6B924BC71B}"
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "MyRecipes.Web", "src\MyRecipes.Web\MyRecipes.Web.esproj", "{786AC12C-F059-49EF-83B2-A19913543B2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,12 @@ Global
 		{9CBE46C7-7DED-4E36-9FF6-8A6B924BC71B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CBE46C7-7DED-4E36-9FF6-8A6B924BC71B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CBE46C7-7DED-4E36-9FF6-8A6B924BC71B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{786AC12C-F059-49EF-83B2-A19913543B2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{786AC12C-F059-49EF-83B2-A19913543B2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{786AC12C-F059-49EF-83B2-A19913543B2D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{786AC12C-F059-49EF-83B2-A19913543B2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{786AC12C-F059-49EF-83B2-A19913543B2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{786AC12C-F059-49EF-83B2-A19913543B2D}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +54,7 @@ Global
 		{28963DBA-022D-46B8-9FEE-D9592E127CEA} = {75110CBD-27C8-4A81-BBC5-4D33661A02B7}
 		{AD1F7D08-967B-44F2-BA43-456A337BB062} = {2BFE8639-FB16-4558-A093-C1585C9E385E}
 		{9CBE46C7-7DED-4E36-9FF6-8A6B924BC71B} = {2BFE8639-FB16-4558-A093-C1585C9E385E}
+		{786AC12C-F059-49EF-83B2-A19913543B2D} = {75110CBD-27C8-4A81-BBC5-4D33661A02B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {074F6438-9DFD-4BBD-91EE-A90EE601274E}

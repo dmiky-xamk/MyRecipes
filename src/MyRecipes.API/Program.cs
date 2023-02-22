@@ -8,6 +8,18 @@ var builder = WebApplication.CreateBuilder(args);
 // TODO: Replace IConfiguration with IOptions.
 // TODO: Learn to write more tests.
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", policy =>
+    {
+        policy
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()
+        .WithOrigins("http://localhost:3000");
+    });
+});
+
 // Add services to the container.
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrasctuctureServices(builder.Configuration);
@@ -33,6 +45,8 @@ if (app.Environment.IsDevelopment())
         await initializer.SeedAsync();
     }
 }
+
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 

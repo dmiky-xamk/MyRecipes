@@ -1,0 +1,16 @@
+/*
+  Use CSS to set height values for the parents 
+  so we can center content more easily in the application 
+  without using viewHeight.
+  https://dev.to/fenok/stretching-body-to-full-viewport-height-the-missing-way-2ghd
+*/
+
+html,
+body {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+}

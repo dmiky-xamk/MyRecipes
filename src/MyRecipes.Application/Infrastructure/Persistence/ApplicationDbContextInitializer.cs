@@ -53,11 +53,10 @@ public class ApplicationDbContextInitializer
         // Default user
         ApplicationUser adminUser = new()
         {
-            UserName = "admin",
             Email = "admin@localhost.com"
         };
 
-        if (_userManager.Users.All(u => u.UserName != adminUser.UserName))
+        if (_userManager.Users.All(u => u.Email != adminUser.Email))
         {
             await _userManager.CreateAsync(adminUser, "Admin123");
         }

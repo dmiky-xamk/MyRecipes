@@ -15,4 +15,7 @@ public class CurrentUserService : ICurrentUserService
     // Get the current user's ID to get only the recipes belonging to him.
     public string? UserId
         => _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    public string? Email
+        => _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
 }

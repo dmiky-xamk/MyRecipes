@@ -1,9 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MyRecipes.Application.Common.Models;
-using MyRecipes.Application.Users;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using MyRecipes.Application.Infrastructure.Identity;
+using System.Net;
 
 namespace MyRecipes.API.Controllers;
 
@@ -37,34 +35,8 @@ public abstract class ApiBaseController : ControllerBase
             return Ok(result.Value);
         }
 
-        return BadRequest(result.Error);
-    }
-
-    protected ActionResult<string> HandleIdentityResult<T>(IdentificationResult<T> result)
-    {
-        // Unauthorized (user not found during login, credentials are wrong)
-        // Bad Request (unknown error during registration)
-        // ValidationProblem (credentials already in use)
-        if (result.IsSuccess)
-        {
-            return Ok(result.Value);
-        }
-
-        // TODO: Refactor?
-        switch (result.IdentityError)
-        {
-            case IdentificationError.UsernameTaken:
-            case IdentificationError.EmailTaken:
-                ModelState.AddModelError(result.ErrorState.Item1, result.ErrorState.Item2);
-                return ValidationProblem(ModelState);
-
-            case IdentificationError.WrongCredentials:
-            case IdentificationError.UserNotFound:
-                return Unauthorized();
-
-            case IdentificationError.UnknownError:
-            default:
-                return BadRequest(result.Error);
-        }
+        // Return a better formatted error (https://blog.frankel.ch/structured-errors-http-apis/)
+        // https://stackoverflow.com/questions/63301306/add-detail-message-to-asp-net-core-3-1-standard-json-badrequest-response
+        return Problem(title: result.Error, statusCode: (int)HttpStatusCode.BadRequest);
     }
 }

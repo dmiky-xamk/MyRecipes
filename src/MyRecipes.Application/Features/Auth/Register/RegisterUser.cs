@@ -6,12 +6,12 @@ namespace MyRecipes.Application.Features.Auth.Register;
 
 public class RegisterUser
 {
-    public class Command : IRequest<IdentificationResult<string>>
+    public class Command : IRequest<Result<string, AuthError>>
     {
-        public RegisterDto RegisterDto { get; set; } = default!;
+        public required RegisterDto RegisterDto { get; set; }
     }
 
-    public class Handler : IRequestHandler<Command, IdentificationResult<string>>
+    public class Handler : IRequestHandler<Command, Result<string, AuthError>>
     {
         private readonly IIdentityService _identityService;
         private readonly ITokenService _tokenService;
@@ -22,23 +22,18 @@ public class RegisterUser
             _tokenService = tokenService;
         }
 
-        public async Task<IdentificationResult<string>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<string, AuthError>> Handle(Command request, CancellationToken cancellationToken)
         {
             var result = await _identityService.RegisterAsync(request.RegisterDto);
 
             if (result.IsSuccess)
             {
-                string token = _tokenService.GenerateToken(request.RegisterDto.Username, result.UserId);
+                string token = _tokenService.GenerateToken(request.RegisterDto.Email, result.Value);
 
-                return IdentificationResult<string>.Success(token);
+                return Result<string, AuthError>.Success(token);
             }
 
-            if (result.IdentityError == IdentificationError.UnknownError)
-            {
-                return IdentificationResult<string>.Failure(result.IdentityError, result.Error);
-            }
-
-            return IdentificationResult<string>.Failure(result.IdentityError, result.ErrorState);
+            return result;
         }
     }
 }

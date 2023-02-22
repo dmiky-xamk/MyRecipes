@@ -6,12 +6,12 @@ namespace MyRecipes.Application.Features.Auth.Login;
 
 public class LoginUser
 {
-    public class Query : IRequest<IdentificationResult<string>>
+    public class Query : IRequest<Result<string, AuthError>>
     {
-        public LoginDto LoginDto { get; set; } = default!;
+        public required LoginDto LoginDto { get; set; }
     }
 
-    public class Handler : IRequestHandler<Query, IdentificationResult<string>>
+    public class Handler : IRequestHandler<Query, Result<string, AuthError>>
     {
         private readonly IIdentityService _identityService;
         private readonly ITokenService _tokenService;
@@ -22,18 +22,18 @@ public class LoginUser
             _tokenService = tokenService;
         }
 
-        public async Task<IdentificationResult<string>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<string, AuthError>> Handle(Query request, CancellationToken cancellationToken)
         {
             var result = await _identityService.LoginAsync(request.LoginDto);
 
             if (result.IsSuccess)
             {
-                string token = _tokenService.GenerateToken(request.LoginDto.Username, result.UserId);
+                string token = _tokenService.GenerateToken(request.LoginDto.Email, result.Value);
 
-                return IdentificationResult<string>.Success(token);
+                return Result<string, AuthError>.Success(token);
             }
 
-            return IdentificationResult<string>.Failure(result.IdentityError);
+            return result;
         }
     }
 }

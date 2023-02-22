@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyRecipes.Application.Common.Models;
+using MyRecipes.Application.Features.Auth;
 using MyRecipes.Application.Features.Auth.Login;
 using MyRecipes.Application.Features.Auth.Register;
 using MyRecipes.Application.Infrastructure.Identity;
+using System.Security.Claims;
 
 namespace MyRecipes.Infrastructure.Identity;
 
@@ -18,29 +20,16 @@ public class IdentityService : IIdentityService
         _signInManager = signInManager;
     }
 
-    // TODO: username password email as strings?
-    public async Task<IdentificationResult<IdentificationError>> RegisterAsync(RegisterDto registerDto)
+    public async Task<Result<string, AuthError>> RegisterAsync(RegisterDto registerDto)
     {
-        // TODO: Move to Validator?
-        if (await _userManager.Users.AnyAsync(x => x.UserName.ToLower() == registerDto.Username.ToLower()))
-        {
-            return IdentificationResult<IdentificationError>.Failure(
-                IdentificationError.UsernameTaken,
-                "username",
-                "The username has already been taken.");
-        }
-
         if (await _userManager.Users.AnyAsync(x => x.Email.ToLower() == registerDto.Email.ToLower()))
         {
-            return IdentificationResult<IdentificationError>.Failure(
-                IdentificationError.EmailTaken,
-                "email",
-                "The email has already been taken.");
+            return Result<string, AuthError>.Failure("The email has already been taken.", AuthError.EmailAlreadyTaken);
         }
 
         var appUser = new ApplicationUser()
         {
-            UserName = registerDto.Username,
+            UserName = registerDto.Email,
             Email = registerDto.Email
         };
 
@@ -48,32 +37,45 @@ public class IdentityService : IIdentityService
 
         if (result.Succeeded)
         {
-            return IdentificationResult<IdentificationError>.Success(IdentificationError.None, appUser.Id);
+            return Result<string, AuthError>.Success(appUser.Id);
         }
 
-        return IdentificationResult<IdentificationError>.Failure(
-            IdentificationError.UnknownError,
-            "An unexpected error occured during registration.");
+        return Result<string, AuthError>.Failure("An unexpected error occured during registration.", AuthError.Unknown);
     }
 
-    public async Task<IdentificationResult<IdentificationError>> LoginAsync(LoginDto loginDto)
+    public async Task<Result<string, AuthError>> LoginAsync(LoginDto loginDto)
     {
         var user = await _userManager.Users
-            .FirstOrDefaultAsync(x => x.UserName == loginDto.Username);
+            .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
         // The user not found in the database.
         if (user is null)
         {
-            return IdentificationResult<IdentificationError>.Failure(IdentificationError.UserNotFound);
+            return Result<string, AuthError>.Failure("Invalid credentials", AuthError.InvalidCredentials);
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-        
+
         if (result.Succeeded)
         {
-            return IdentificationResult<IdentificationError>.Success(IdentificationError.None, user.Id);
+            return Result<string, AuthError>.Success(user.Id);
         }
 
-        return IdentificationResult<IdentificationError>.Failure(IdentificationError.WrongCredentials);
+        return Result<string, AuthError>.Failure("Invalid credentials", AuthError.InvalidCredentials);
     }
 }
+
+//    public async Task<Result<string>> GetCurrentUserAsync(ClaimsPrincipal user)
+//    {
+//        var currentUser = await _userManager.Users
+//            .FirstOrDefaultAsync(u => u.Email == user.FindFirstValue(ClaimTypes.Email));
+
+//        if (currentUser is null)
+//        {
+//            return Result<string>.Failure("No user found");
+//        }
+
+//        return Result<string>.Success("Ok");
+
+//    }
+//}

@@ -21,7 +21,7 @@ public class TokenService : ITokenService
         _tokenAudience = _config.GetValue<string>("Authentication:Audience");
     }
 
-    public string GenerateToken(string username, string userId)
+    public string GenerateToken(string email, string userId)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenKey));
 
@@ -30,7 +30,7 @@ public class TokenService : ITokenService
         List<Claim> claims = new()
         {
             new(JwtRegisteredClaimNames.Sub, userId),
-            new(JwtRegisteredClaimNames.UniqueName, username),
+            new(JwtRegisteredClaimNames.Email, email),
         };
 
         // TODO: Change the expire date, add refresh token.

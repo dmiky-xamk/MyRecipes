@@ -105,16 +105,14 @@ export default function AuthForm({ authMode, handleAuth }: Props) {
           },
         }}
         render={({ field }) => (
-          <Fragment>
-            <TextField
-              {...field}
-              id="email"
-              label="Email"
-              type="email"
-              error={Boolean(errors?.email) || Boolean(error?.errors?.Email)}
-              helperText={errors?.email?.message || error?.errors?.Email?.at(0)}
-            />
-          </Fragment>
+          <TextField
+            {...field}
+            id="email"
+            label="Email"
+            type="email"
+            error={Boolean(errors?.email) || Boolean(error?.errors?.Email)}
+            helperText={errors?.email?.message || error?.errors?.Email?.at(0)}
+          />
         )}
       />
       <Controller

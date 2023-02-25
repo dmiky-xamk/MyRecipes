@@ -65,7 +65,7 @@ public class RecipesController : ApiBaseController
     /// <response code="400">If the update failed</response>
     /// <response code="401">If the user is not authorized</response> 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRecipe([FromBody] RecipeDto recipe, long id)
+    public async Task<IActionResult> UpdateRecipe([FromBody] RecipeDto recipe, string id)
     {
         var result = await Mediator.Send(new UpdateRecipe.Command { Recipe = recipe, Id = id });
 

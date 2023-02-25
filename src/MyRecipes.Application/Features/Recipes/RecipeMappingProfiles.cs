@@ -22,7 +22,7 @@ public static class RecipeMappingProfiles
     public static QueryRecipeDto ToQueryRecipeDto(this RecipeEntity recipe)
     {
         var ingredients = recipe.Ingredients.Select(ing => ing.ToIngredientDto());
-        return new QueryRecipeDto(recipe.Id, recipe.Name, recipe.Description, recipe.Image, ingredients);
+        return new QueryRecipeDto(recipe.Id.ToString(), recipe.Name, recipe.Description, recipe.Image, ingredients);
     }
 
     public static RecipeEntity ToRecipeEntity(this RecipeDto recipe, long recipeId, string userId)

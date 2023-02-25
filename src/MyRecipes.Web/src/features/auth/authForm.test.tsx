@@ -13,7 +13,7 @@ import "@testing-library/jest-dom/extend-expect";
 import { ApiErrorResponse } from "../../api/agent";
 import { AuthCredentials, User } from "./auth";
 
-// TODO: Mimic API calls?
+// TODO: Mock API calls?
 
 // Thanks to Alan for the great examples.
 // https://github.com/alan2207/react-query-auth/blob/master/test/index.test.tsx
@@ -29,7 +29,6 @@ const renderAppHook = <Result,>(hook: () => Result) => {
 
 const user: User = {
   token: "test",
-  recipes: [],
 };
 
 const config = {

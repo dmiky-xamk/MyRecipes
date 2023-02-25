@@ -8,7 +8,6 @@ export interface AuthCredentials {
 
 export interface User {
   token: string;
-  recipes: [];
 }
 
 const userFn = async (): Promise<User | null> => {
@@ -18,8 +17,8 @@ const userFn = async (): Promise<User | null> => {
     updateAxiosToken(token);
     return agent.Account.user().then(
       // Token is valid, the user is authenticated.
-      (recipes) => {
-        return { token: token, recipes: recipes };
+      () => {
+        return { token: token };
       },
       // Remove the token and return null if the token validation fails (API sends 401).
       (_) => {
@@ -38,7 +37,7 @@ const handleAuthResponse = (token: string): User => {
   localStorage.setItem("token", token);
 
   // TODO: Get the recipes when logging in?
-  return { token: token, recipes: [] };
+  return { token: token };
 };
 
 const loginFn = async (credentials: AuthCredentials) => {

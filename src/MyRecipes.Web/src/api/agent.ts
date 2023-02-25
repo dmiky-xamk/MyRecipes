@@ -1,4 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { AuthCredentials } from "../features/auth/auth";
+import { Recipe } from "../features/recipes/recipe";
 
 // axios.defaults.baseURL = "https://localhost:7150/api";
 axios.defaults.headers.common["Content-Type"] = "application/json";
@@ -55,10 +57,12 @@ const requests = {
   delete: (url: string) => axios.post(url).then(responseBody),
 };
 
-interface AuthCredentials {
-  email: string;
-  password: string;
-}
+const Recipes = {
+  list: (): Promise<Recipe[]> => requests.get("/recipes"),
+  details: (id: string): Promise<Recipe> => requests.get(`/recipes/${id}`),
+  update: (id: string, recipe: Recipe) =>
+    requests.put(`/recipes/${id}`, recipe),
+};
 
 const Account = {
   user: () => requests.get("/account"),
@@ -68,6 +72,7 @@ const Account = {
 
 const agent = {
   Account,
+  Recipes,
 };
 
 export default agent;

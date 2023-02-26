@@ -62,6 +62,7 @@ const Recipes = {
   details: (id: string): Promise<Recipe> => requests.get(`/recipes/${id}`),
   update: (id: string, recipe: Recipe) =>
     requests.put(`/recipes/${id}`, recipe),
+  create: (recipe: Recipe) => requests.post(`/recipes`, recipe),
 };
 
 const Account = {

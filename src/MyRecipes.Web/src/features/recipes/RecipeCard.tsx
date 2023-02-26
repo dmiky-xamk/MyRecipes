@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { Recipe } from "./recipe";
 
 interface Props {

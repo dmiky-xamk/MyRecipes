@@ -1,4 +1,4 @@
-import { Book, Search } from "@mui/icons-material";
+import { Book, Search, ShoppingCart } from "@mui/icons-material";
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import React, { useEffect } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
@@ -17,8 +17,7 @@ export default function BottomNav() {
       <BottomNavigation
         showLabels
         value={value}
-        onChange={(event, newValue) => {
-          console.log("Value:", newValue);
+        onChange={(_, newValue) => {
           setValue(newValue);
         }}
       >
@@ -35,6 +34,13 @@ export default function BottomNav() {
           to="search"
           icon={<Search />}
           label="Search"
+        />
+        <BottomNavigationAction
+          value="/cart"
+          component={RouterLink}
+          to="cart"
+          icon={<ShoppingCart />}
+          label="Cart"
         />
       </BottomNavigation>
     </Paper>

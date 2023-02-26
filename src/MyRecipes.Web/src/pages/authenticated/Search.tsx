@@ -1,25 +1,13 @@
-import { Check } from "@mui/icons-material";
-import {
-  Autocomplete,
-  Card,
-  CardContent,
-  Divider,
-  List,
-  ListItem,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Autocomplete, Box, List, TextField, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { Ingredient, Recipe, useRecipes } from "../../features/recipes/recipe";
+import {
+  Ingredient,
+  MatchedRecipe,
+  useRecipes,
+} from "../../features/recipes/recipe";
+import { RecipeEditTextField } from "../../features/recipes/RecipeEditTextField";
+import RecipeSearchCard from "../../features/recipes/RecipeSearchCard";
 import PageContainer from "../../features/ui/main/PageContainer";
-
-interface MatchedRecipe {
-  recipe: Recipe;
-  matchingIngredients: Ingredient[];
-  nonMatchingIngredients: Ingredient[];
-  totalIngredientsCount: number;
-}
 
 export default function Search() {
   const { recipes, isLoading } = useRecipes();
@@ -74,8 +62,7 @@ export default function Search() {
   }, [matchRecipesWithIngredients, autoCompleteValues]);
 
   return (
-    <PageContainer>
-      {/* <Stack justifyContent="end"> */}
+    <PageContainer fullHeight>
       <Autocomplete
         disablePortal
         filterSelectedOptions
@@ -87,47 +74,26 @@ export default function Search() {
         id="ingredient-search"
         options={uniqueIngredientNames}
         renderInput={(params) => (
-          <TextField {...params} label="Ingredient" disabled={isLoading} />
+          <RecipeEditTextField
+            {...params}
+            label="Ingredients"
+            disabled={isLoading}
+          />
         )}
       />
       <List>
         {matchedRecipes.map((matched: MatchedRecipe) => {
           return (
-            <ListItem key={matched.recipe.id}>
-              <Card sx={{ flex: 1 }}>
-                <CardContent>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="h6" gutterBottom>
-                      {matched.recipe.name}
-                    </Typography>
-                    <Typography>{`${matched.matchingIngredients.length} / ${matched.totalIngredientsCount}`}</Typography>
-                  </Stack>
-                  <Stack direction="row" gap={2} flexWrap="wrap">
-                    {matched.matchingIngredients.map((ing) => {
-                      return <Typography key={ing.name}>{ing.name}</Typography>;
-                    })}
-                  </Stack>
-                  <Divider component="li" sx={{ my: 1 }} />
-                  <Stack direction="row" gap={2} flexWrap="wrap">
-                    {matched.nonMatchingIngredients.map((ing) => {
-                      return (
-                        <Typography
-                          key={ing.name}
-                          variant="body2"
-                          color="GrayText"
-                        >
-                          {ing.name}
-                        </Typography>
-                      );
-                    })}
-                  </Stack>
-                </CardContent>
-              </Card>
-            </ListItem>
+            <RecipeSearchCard
+              key={matched.recipe.id}
+              recipe={matched.recipe}
+              matchingIngredients={matched.matchingIngredients}
+              nonMatchingIngredients={matched.nonMatchingIngredients}
+              totalIngredientsCount={matched.totalIngredientsCount}
+            />
           );
         })}
       </List>
-      {/* </Stack> */}
     </PageContainer>
   );
 }

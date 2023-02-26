@@ -1,9 +1,4 @@
-import {
-  useMutation,
-  UseMutationOptions,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../../api/agent";
 
 export interface Recipe {
@@ -18,6 +13,13 @@ export interface Ingredient {
   name: string;
   unit: string;
   amount: string;
+}
+
+export interface MatchedRecipe {
+  recipe: Recipe;
+  matchingIngredients: Ingredient[];
+  nonMatchingIngredients: Ingredient[];
+  totalIngredientsCount: number;
 }
 
 export interface FormFields {
@@ -91,6 +93,18 @@ const useRecipe = (recipeId: string) => {
   return { recipe, isLoading, isError, error };
 };
 
+const useCreateRecipe = () => {
+  return useMutation<any, RecipeErrorResponse, Recipe, void>(
+    (recipe: Recipe) => agent.Recipes.create(recipe),
+    {
+      onSuccess: (newRecipe) => {
+        console.log("Create recipe:", newRecipe);
+        //  queryClient.invalidateQueries(["recipe", recipe.id])
+      },
+    }
+  );
+};
+
 // TODO: Optimistic update?
 const useUpdateRecipe = () => {
   const queryClient = useQueryClient();
@@ -99,11 +113,11 @@ const useUpdateRecipe = () => {
     (recipe: Recipe) => agent.Recipes.update(recipe.id, recipe),
     {
       onSuccess: (newRecipe) => {
-        console.log("Success recipe:", newRecipe);
+        console.log("Update recipe:", newRecipe);
         //  queryClient.invalidateQueries(["recipe", recipe.id])
       },
     }
   );
 };
 
-export { useRecipe, useRecipes, useUpdateRecipe };
+export { useRecipe, useRecipes, useCreateRecipe, useUpdateRecipe };

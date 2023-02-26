@@ -67,6 +67,12 @@ export default function Recipe() {
           </Stack>
           <Stack gap={0.2}>{ingredients}</Stack>
         </Box>
+        <Box>
+          <Typography variant="h6" gutterBottom>
+            Directions
+          </Typography>
+          <Typography>Under construction...</Typography>
+        </Box>
       </Stack>
     </PageContainer>
   );

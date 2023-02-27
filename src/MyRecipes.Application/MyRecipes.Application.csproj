@@ -21,6 +21,8 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Dapper" Version="2.0.123" />
+		<PackageReference Include="Npgsql" Version="6.0.0" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.0" />
 		<PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
 	</ItemGroup>
 

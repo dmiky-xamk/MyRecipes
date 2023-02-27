@@ -3,22 +3,22 @@ using Microsoft.Extensions.Configuration;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Domain.Entities;
 using System.Data;
-using System.Data.SQLite;
+using Npgsql;
 
 namespace MyRecipes.Infrastructure.Persistence;
 
 /// <summary>
 /// Handles the direct contact with the Sqlite database.
 /// </summary>
-internal class SqliteDataAccess : IDataAccess
+internal class PostgreSqlDataAccess : IDataAccess
 {
     private readonly IConfiguration _config;
     private readonly string _connectionString;
 
-    public SqliteDataAccess(IConfiguration config)
+    public PostgreSqlDataAccess(IConfiguration config)
     {
         _config = config;
-        _connectionString = _config.GetConnectionString("Default");
+        _connectionString = _config.GetConnectionString("Postgre");
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ internal class SqliteDataAccess : IDataAccess
     public async Task<IEnumerable<RecipeEntity>> QueryRecipes<T>(string sqlStatement, T parameters)
     {
         // TODO: Create RecipeDataAccess?
-        using (IDbConnection connection = new SQLiteConnection(_connectionString))
+        using (IDbConnection connection = new NpgsqlConnection(_connectionString))
         {
             // All the recipes to return along with their ingredients will be added here.
             var recipeDictionary = new Dictionary<string, RecipeEntity>();
@@ -61,7 +61,7 @@ internal class SqliteDataAccess : IDataAccess
 
     public async Task<List<T>> QueryData<T, U>(string sqlStatement, U parameters)
     {
-        using (IDbConnection connection = new SQLiteConnection(_connectionString))
+        using (IDbConnection connection = new NpgsqlConnection(_connectionString))
         {
             List<T> rows = (await connection.QueryAsync<T>(sqlStatement, parameters)).ToList();
 
@@ -71,7 +71,7 @@ internal class SqliteDataAccess : IDataAccess
 
     public async Task<T?> QueryDataSingle<T, U>(string sqlStatement, U parameters)
     {
-        using (IDbConnection connection = new SQLiteConnection(_connectionString))
+        using (IDbConnection connection = new NpgsqlConnection(_connectionString))
         {
             return await connection.QueryFirstOrDefaultAsync<T>(sqlStatement, parameters);
         }
@@ -86,7 +86,7 @@ internal class SqliteDataAccess : IDataAccess
     /// <returns>The number of rows affected.</returns>
     public async Task<int> ExecuteStatement<T>(string sqlStatement, T parameters)
     {
-        using (IDbConnection connection = new SQLiteConnection(_connectionString))
+        using (IDbConnection connection = new NpgsqlConnection(_connectionString))
         {
             return await connection.ExecuteAsync(sqlStatement, parameters);
         }

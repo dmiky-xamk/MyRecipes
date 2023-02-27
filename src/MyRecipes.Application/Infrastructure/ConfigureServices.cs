@@ -12,8 +12,8 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrasctuctureServices(this IServiceCollection services, IConfiguration config)
     {
-        services.AddScoped<IDataAccess, SqliteDataAccess>();
-        services.AddScoped<ICrud, Crud>();
+        services.AddScoped<IDataAccess, PostgreSqlDataAccess>();
+        services.AddScoped<ICrud, PostgreSqlCrud>();
 
         services.ConfigureDbContext(config);
         services.AddScoped<IIdentityService, IdentityService>();
@@ -25,7 +25,10 @@ public static class ConfigureServices
     {
         services.AddDbContext<ApplicationDbContext>(opt =>
         {
-            opt.UseSqlite(config.GetConnectionString("Default"),
+            //opt.UseSqlite(config.GetConnectionString("Default"),
+            //    builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
+            
+            opt.UseNpgsql(config.GetConnectionString("Postgre"),
                 builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
         });
 

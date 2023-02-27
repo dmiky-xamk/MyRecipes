@@ -8,6 +8,6 @@ namespace MyRecipes.Application.Recipes.Queries;
 public record QueryRecipeDto(
     string Id,
     string Name,
-    string? Description,
-    string? Image,
+    string Description,
+    string Image,
     IEnumerable<IngredientDto> Ingredients) : RecipeDto(Name, Description, Image, Ingredients);

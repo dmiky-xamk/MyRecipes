@@ -31,14 +31,7 @@ public class UpdateRecipe
         {
             string userId = _userService.UserId!;
 
-            bool isRecipeIdValid = long.TryParse(request.Id, out long recipeId);
-
-            if (!isRecipeIdValid)
-            {
-                return Result<Unit>.Failure("Failed to update the recipe.");
-            }
-
-            RecipeEntity recipe = request.Recipe.ToRecipeEntity(recipeId, userId);
+            RecipeEntity recipe = request.Recipe.ToRecipeEntity(request.Id, userId);
 
             var affectedRows = await _db.UpdateRecipeAsync(recipe);
 

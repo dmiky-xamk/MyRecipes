@@ -30,7 +30,7 @@ public class CreateRecipe
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
             // Create the recipe Snowflake Id
-            long recipeId = _idGen.CreateId();
+            string recipeId = _idGen.CreateId().ToString();
             string userId = _userService.UserId!;
 
             RecipeEntity recipe = request.Recipe.ToRecipeEntity(recipeId, userId);

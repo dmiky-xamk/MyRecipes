@@ -14,7 +14,7 @@ public static class RecipeMappingProfiles
         return new IngredientDto(ingredient.Name, ingredient.Unit, ingredient.Amount);
     }
 
-    public static IngredientEntity ToIngredientEntity(this IngredientDto ingredient, long recipeId)
+    public static IngredientEntity ToIngredientEntity(this IngredientDto ingredient, string recipeId)
     {
         return new IngredientEntity(recipeId, ingredient.Name, ingredient.Unit, ingredient.Amount);
     }
@@ -25,7 +25,7 @@ public static class RecipeMappingProfiles
         return new QueryRecipeDto(recipe.Id.ToString(), recipe.Name, recipe.Description, recipe.Image, ingredients);
     }
 
-    public static RecipeEntity ToRecipeEntity(this RecipeDto recipe, long recipeId, string userId)
+    public static RecipeEntity ToRecipeEntity(this RecipeDto recipe, string recipeId, string userId)
     {
         var ingredients = recipe.Ingredients.Select(ing => ing.ToIngredientEntity(recipeId)).ToList();
         return new RecipeEntity()

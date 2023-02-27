@@ -10,7 +10,7 @@ public class IngredientEntity
 
     // Signal the compiler that the constructor already initializes the 'Name'.
     [SetsRequiredMembers]
-    public IngredientEntity(long recipeId, string name, string? unit, int? amount)
+    public IngredientEntity(string recipeId, string name, string unit, string amount)
     {
         RecipeId = recipeId;
         Name = name; 
@@ -20,10 +20,10 @@ public class IngredientEntity
 
     // Id will be created by the db.
     public int Id { get; set; } = default!;
-    public long RecipeId { get; set; }
+    public required string RecipeId { get; set; }
     public required string Name { get; set; }
-    public string? Unit { get; set; }
+    public string Unit { get; set; } = string.Empty;
 
     // TODO: Convert to a string or a double.
-    public int? Amount { get; set; }
+    public string Amount { get; set; } = string.Empty;
 }

@@ -19,7 +19,7 @@ public class RecipeDtoValidationTests
     {
         List<IngredientDto> ingredients = new()
         {
-            new IngredientDto("Flour", "dl", 4)
+            new IngredientDto("Flour", "dl", "4")
         };
 
         var recipe = new RecipeDto(string.Empty, string.Empty, string.Empty, ingredients);
@@ -34,7 +34,7 @@ public class RecipeDtoValidationTests
     {
         List<IngredientDto> ingredients = new()
         {
-            new IngredientDto(string.Empty, "dl", 4)
+            new IngredientDto(string.Empty, "dl", "4")
         };
 
         var recipe = new RecipeDto("Test", string.Empty, string.Empty, ingredients);

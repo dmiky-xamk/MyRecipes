@@ -94,23 +94,16 @@ internal class PostgreSqlDataAccess : IDataAccess
 
     private static string? ParseConnectionString()
     {
-        var connUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        string? pgHost = Environment.GetEnvironmentVariable("PGHOST");
+        string? pgPort = Environment.GetEnvironmentVariable("PGPORT");
+        string? pgUser = Environment.GetEnvironmentVariable("PGUSER");
+        string? pgPass = Environment.GetEnvironmentVariable("PGPASSWORD");
+        string? pgDb = Environment.GetEnvironmentVariable("PGDATABASE");
 
-        if (connUrl is null)
+        if (Enumerable.Any(new string[] { pgHost, pgPort, pgUser, pgPass, pgDb }, s => s is null))
         {
             return null;
-        }
-
-        // Parse connection URL to connection string for Npgsql
-        connUrl = connUrl.Replace("postgres://", string.Empty);
-        var pgUserPass = connUrl.Split("@")[0];
-        var pgHostPortDb = connUrl.Split("@")[1];
-        var pgHostPort = pgHostPortDb.Split("/")[0];
-        var pgDb = pgHostPortDb.Split("/")[1];
-        var pgUser = pgUserPass.Split(":")[0];
-        var pgPass = pgUserPass.Split(":")[1];
-        var pgHost = pgHostPort.Split(":")[0];
-        var pgPort = pgHostPort.Split(":")[1];
+        };
 
         return $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}; SSL Mode=Require; Trust Server Certificate=true";
     }

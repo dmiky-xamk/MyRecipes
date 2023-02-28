@@ -5,6 +5,7 @@ using MyRecipes.Application.Infrastructure.Identity;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Infrastructure.Identity;
 using MyRecipes.Infrastructure.Persistence;
+using System.Data.Common;
 
 namespace MyRecipes.Infrastructure;
 
@@ -27,8 +28,40 @@ public static class ConfigureServices
         {
             //opt.UseSqlite(config.GetConnectionString("Default"),
             //    builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
-            
-            opt.UseNpgsql(config.GetConnectionString("Postgre"),
+
+            string? env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            if (env is null)
+            {
+                throw new ApplicationException("'ASPNETCORE_ENVIRONMENT' is null.");
+            }
+
+            string connectionString = string.Empty;
+            if (env == "Development")
+            {
+                connectionString = config.GetConnectionString("Postgre");
+            }
+
+            else
+            {
+                string? pgHost = Environment.GetEnvironmentVariable("PGHOST");
+                string? pgPort = Environment.GetEnvironmentVariable("PGPORT");
+                string? pgUser = Environment.GetEnvironmentVariable("PGUSER");
+                string? pgPass = Environment.GetEnvironmentVariable("PGPASSWORD");
+                string? pgDb = Environment.GetEnvironmentVariable("PGDATABASE");
+
+                if (Enumerable.Any(new string?[] { pgHost, pgPort, pgUser, pgPass, pgDb }, s => s is null))
+                {
+                    throw new ApplicationException("Some of the database connection environment variables were null.");
+                }
+
+                else
+                {
+                    connectionString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}; SSL Mode=Require; Trust Server Certificate=true";
+                }
+            }
+
+            opt.UseNpgsql(connectionString,
                 builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
         });
 

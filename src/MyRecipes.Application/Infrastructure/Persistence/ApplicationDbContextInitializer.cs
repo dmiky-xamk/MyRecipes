@@ -77,7 +77,7 @@ public class ApplicationDbContextInitializer
         }
 
         var sqlRecipe = """
-                CREATE TABLE recipe ( 
+                CREATE TABLE IF NOT EXISTS recipe ( 
             	id Text NOT NULL,
             	name Text NOT NULL,
             	description Text NOT NULL DEFAULT '',
@@ -88,7 +88,7 @@ public class ApplicationDbContextInitializer
             """;
 
         var sqlIngredient = """
-                CREATE TABLE ingredient ( 
+                CREATE TABLE IF NOT EXISTS ingredient ( 
             	id SERIAL,
             	name Text NOT NULL,
             	unit Text NOT NULL DEFAULT '',

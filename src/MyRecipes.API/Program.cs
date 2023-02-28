@@ -27,6 +27,13 @@ builder.Services.AddAPIServices(builder.Configuration);
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var initializer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
+    await initializer.InitializeAsync();
+    await initializer.SeedAsync();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -37,13 +44,6 @@ if (app.Environment.IsDevelopment())
         // https://github.com/TryCatchLearn/Restore/blob/0da0ea7fcab7d6d4d1ba79b5d37c1fdab0cd8927/API/Program.cs
         opt.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
     });
-
-    using (var scope = app.Services.CreateScope())
-    {
-        var initializer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
-        await initializer.InitializeAsync();
-        await initializer.SeedAsync();
-    }
 }
 
 app.UseCors("CorsPolicy");

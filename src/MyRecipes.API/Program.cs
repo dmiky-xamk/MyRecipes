@@ -16,7 +16,7 @@ builder.Services.AddCors(opt =>
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()
-        .WithOrigins("http://localhost:3000");
+        .WithOrigins("http://localhost:3000", "https://myrecipes-api.up.railway.app");
     });
 });
 

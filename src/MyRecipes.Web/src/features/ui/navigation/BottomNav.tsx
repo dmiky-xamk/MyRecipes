@@ -13,7 +13,10 @@ export default function BottomNav() {
   }, [pathname]);
 
   return (
-    <Paper sx={{ position: "sticky", bottom: 0 }} elevation={3}>
+    <Paper
+      sx={{ position: "sticky", bottom: 0, marginTop: "auto" }}
+      elevation={3}
+    >
       <BottomNavigation
         showLabels
         value={value}

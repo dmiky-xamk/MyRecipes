@@ -30,7 +30,7 @@ export default function AuthenticatedApp() {
   }
 
   return (
-    <Stack justifyContent="space-between" flex={1}>
+    <Stack flex={1}>
       <AppBar position="sticky" color="default">
         <Toolbar sx={{ justifyContent: "end" }}>
           <Button color="inherit" onClick={logout.mutate}>

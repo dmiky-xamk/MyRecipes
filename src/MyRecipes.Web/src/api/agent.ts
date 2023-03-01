@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { AuthCredentials } from "../features/auth/auth";
 import { Recipe } from "../features/recipes/recipe";
 
-// axios.defaults.baseURL = "https://localhost:7150/api";
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.headers.common["Content-Type"] = "application/json";
 
 const responseBody = (response: AxiosResponse) => response.data;
@@ -10,6 +10,7 @@ const responseBody = (response: AxiosResponse) => response.data;
 export const updateAxiosToken = (token: string | null) =>
   (axios.defaults.headers.common.Authorization = `Bearer ${token}`);
 
+// TODO: Move to auth?
 interface ValidationError {
   Email: [];
   Password: [];
@@ -28,7 +29,9 @@ const sleep = (delay: number) =>
 
 axios.interceptors.response.use(
   async (response) => {
-    await sleep(1000);
+    if (process.env.NODE_ENV === "development") {
+      await sleep(1000);
+    }
 
     return response;
   },

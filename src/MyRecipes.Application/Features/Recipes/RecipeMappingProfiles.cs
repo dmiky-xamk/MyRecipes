@@ -16,7 +16,7 @@ public static class RecipeMappingProfiles
 
     public static IngredientEntity ToIngredientEntity(this IngredientDto ingredient, string recipeId)
     {
-        return new IngredientEntity(recipeId, ingredient.Name, ingredient.Unit, ingredient.Amount);
+        return new IngredientEntity(recipeId, ingredient.Name, ingredient.Unit.ToLower(), ingredient.Amount);
     }
 
     public static QueryRecipeDto ToQueryRecipeDto(this RecipeEntity recipe)

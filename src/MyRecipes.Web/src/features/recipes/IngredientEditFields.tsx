@@ -53,6 +53,7 @@ export default function IngredientEditFields({
         render={({ field }) => (
           <IngredientEditTextField
             {...field}
+            autoCapitalize="off"
             id="ingredient-unit"
             label="Unit"
             sx={{ flex: "1 1 0" }}

@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import "./base.css";
+import ScrollToTop from "./scrollToTop";
 
 // Create a baseline MUI theme for the application.
 const theme = createTheme({
@@ -44,6 +45,7 @@ root.render(
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />
         <BrowserRouter>
+          <ScrollToTop />
           <App />
         </BrowserRouter>
       </QueryClientProvider>

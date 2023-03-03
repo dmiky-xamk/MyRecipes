@@ -68,7 +68,7 @@ export default function AuthForm({ authMode, handleAuth }: Props) {
   const theme = useTheme();
 
   // Get the appropriate auth method (register, login) from the parent
-  const { mutateAsync: authenticate, isLoading, error } = handleAuth;
+  const { mutate: authenticate, isLoading, error: apiError } = handleAuth;
 
   // Form validation
   const {
@@ -93,7 +93,12 @@ export default function AuthForm({ authMode, handleAuth }: Props) {
   };
 
   return (
-    <Stack component="form" gap={1.2} onSubmit={handleSubmit(onSubmit)}>
+    <Stack
+      component="form"
+      gap={1.2}
+      alignSelf="stretch"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <Controller
         name="email"
         control={control}
@@ -110,8 +115,10 @@ export default function AuthForm({ authMode, handleAuth }: Props) {
             id="email"
             label="Email"
             type="email"
-            error={Boolean(errors?.email) || Boolean(error?.errors?.Email)}
-            helperText={errors?.email?.message || error?.errors?.Email?.at(0)}
+            error={Boolean(errors?.email) || Boolean(apiError?.errors?.Email)}
+            helperText={
+              errors?.email?.message || apiError?.errors?.Email?.at(0)
+            }
           />
         )}
       />
@@ -130,7 +137,7 @@ export default function AuthForm({ authMode, handleAuth }: Props) {
           <Fragment>
             <FormControl
               error={
-                Boolean(errors?.password) || Boolean(error?.errors?.Password)
+                Boolean(errors?.password) || Boolean(apiError?.errors?.Password)
               }
             >
               <InputLabel htmlFor="password">Password</InputLabel>
@@ -156,13 +163,13 @@ export default function AuthForm({ authMode, handleAuth }: Props) {
                 label="Password"
               />
               <FormHelperText>
-                {errors?.password?.message || error?.errors?.Password?.at(0)}
+                {errors?.password?.message || apiError?.errors?.Password?.at(0)}
               </FormHelperText>
             </FormControl>
           </Fragment>
         )}
       />
-      {error && <Alert severity="error">{error.title}</Alert>}
+      {apiError && <Alert severity="error">{apiError.title}</Alert>}
       <Button
         type="submit"
         variant="contained"

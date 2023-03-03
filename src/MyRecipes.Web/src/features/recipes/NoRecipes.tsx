@@ -5,7 +5,7 @@ export default function NoRecipes() {
   return (
     <Fragment>
       <Typography variant="h5" color="GrayText">
-        Your recipes will be shown here.
+        Add recipes by clicking the button below
       </Typography>
     </Fragment>
   );

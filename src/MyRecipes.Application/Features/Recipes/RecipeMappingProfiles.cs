@@ -16,7 +16,7 @@ public static class RecipeMappingProfiles
 
     public static IngredientEntity ToIngredientEntity(this IngredientDto ingredient, string recipeId)
     {
-        return new IngredientEntity(recipeId, ingredient.Name, ingredient.Unit.ToLower(), ingredient.Amount);
+        return new IngredientEntity(recipeId, ingredient.Name.Trim(), ingredient.Unit.ToLower().Trim(), ingredient.Amount.Trim());
     }
 
     public static QueryRecipeDto ToQueryRecipeDto(this RecipeEntity recipe)
@@ -32,9 +32,9 @@ public static class RecipeMappingProfiles
         {
             Id = recipeId,
             UserId = userId,
-            Name = recipe.Name,
+            Name = recipe.Name.Trim(),
             Ingredients = ingredients,
-            Description = recipe.Description,
+            Description = recipe.Description.Trim(),
         };
     }
 }

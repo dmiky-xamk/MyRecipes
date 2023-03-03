@@ -32,7 +32,7 @@ export default function PageContainer({
     <Container
       component="main"
       maxWidth={maxWidth}
-      sx={{ mt: 4, ...sx, ...centerContent, height }}
+      sx={{ mt: 4, ...sx, ...centerContent, height, pb: 7 }}
     >
       {children}
     </Container>

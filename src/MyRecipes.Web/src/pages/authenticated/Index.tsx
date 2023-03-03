@@ -1,6 +1,6 @@
-import { Add } from "@mui/icons-material";
-import { Fab, List, ListItem, ListItemButton } from "@mui/material";
+import { List, ListItem, ListItemButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import CreateRecipeFab from "../../features/recipes/CreateRecipeFab";
 import NoRecipes from "../../features/recipes/NoRecipes";
 import { Recipe, useRecipes } from "../../features/recipes/recipe";
 import RecipeCard from "../../features/recipes/RecipeCard";
@@ -30,6 +30,7 @@ export default function Index() {
     return (
       <PageContainer center={true}>
         <NoRecipes />
+        <CreateRecipeFab />
       </PageContainer>
     );
   }
@@ -37,18 +38,7 @@ export default function Index() {
   return (
     <PageContainer>
       <List>{recipes}</List>
-      <Fab
-        color="primary"
-        aria-label="Create a new recipe"
-        sx={{
-          position: "fixed",
-          right: (theme) => theme.spacing(1),
-          bottom: (theme) => `calc(56px + ${theme.spacing(1)})`,
-        }}
-        onClick={() => navigate("recipe/create")}
-      >
-        <Add />
-      </Fab>
+      <CreateRecipeFab />
     </PageContainer>
   );
 }

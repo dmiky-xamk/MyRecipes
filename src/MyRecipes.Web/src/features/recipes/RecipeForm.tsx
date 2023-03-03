@@ -164,7 +164,7 @@ export default function RecipeForm({ mutate, recipe }: Props) {
         />
         {recipeError && <Alert severity="error">{recipeError.title}</Alert>}
         <Button type="submit" variant="contained" disabled={isLoading}>
-          {isLoading ? <CircularProgress size={25} /> : "Tallenna resepti"}
+          {isLoading ? <CircularProgress size={25} /> : "Save recipe"}
         </Button>
       </Stack>
     </Box>

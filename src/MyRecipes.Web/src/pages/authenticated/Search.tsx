@@ -22,7 +22,9 @@ export default function Search() {
   );
 
   // Remove any duplicate ingredient names.
-  const uniqueIngredientNames: string[] = Array.from(new Set(ingredientNames));
+  const uniqueIngredientNames: string[] = Array.from(
+    new Set(ingredientNames)
+  ).sort();
 
   // Find the recipes that have some of the ingredients
   // that the user passed in through the 'Autocomplete'.

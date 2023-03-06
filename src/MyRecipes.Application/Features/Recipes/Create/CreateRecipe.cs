@@ -43,6 +43,7 @@ public class CreateRecipe
             }
 
             await _db.CreateIngredientsAsync(recipe.Ingredients);
+            await _db.CreateDirectionsAsync(recipe.Directions);
 
             // TODO: Return the new recipe so that the client can navigate to it?
             return Result<Unit>.Success(Unit.Value);

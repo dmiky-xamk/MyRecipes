@@ -1,8 +1,10 @@
+import { Delete } from "@mui/icons-material";
 import {
   Alert,
   Box,
   Button,
   CircularProgress,
+  IconButton,
   Stack,
   styled,
   TextField,
@@ -46,39 +48,76 @@ export default function RecipeForm({ mutate, recipe }: Props) {
     defaultValues: {
       recipeName: recipe?.name || "",
       recipeDescription: recipe?.description || "",
-      recipeDirections: "",
       fieldsArray: recipe?.ingredients.map((ing) => {
         return { amount: ing.amount, unit: ing.unit, name: ing.name };
       }) || [{ amount: "", unit: "", name: "" }],
+      directionsArray: recipe?.directions.map((dir) => {
+        return { step: dir.step };
+      }) || [{ step: "" }],
     },
   });
 
   // Form validation for the ingredient fields.
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields,
+    append: appendIngredient,
+    remove: removeIngredient,
+  } = useFieldArray({
     control,
     name: "fieldsArray",
   });
 
+  const {
+    fields: directionFields,
+    append: appendStep,
+    remove: removeStep,
+  } = useFieldArray({
+    control,
+    name: "directionsArray",
+  });
+
   // Each ingredient has three fields: amount, unit, name (only the name is required).
-  const recipeIngredients = fields.map((ingredient, ind) => {
+  const recipeIngredients = fields.map((ingredient, index) => {
     return (
       <IngredientEditFields
         key={ingredient.id}
         control={control}
-        index={ind}
+        index={index}
         errors={errors}
         isDisabled={fields.length <= 1}
-        onRemove={() => removeIngredient(ind)}
+        onRemove={() => removeIngredient(index)}
       />
     );
   });
 
-  const addIngredient = () => {
-    append({ amount: "", unit: "", name: "" });
+  const recipeDirections = directionFields.map((step, index) => {
+    return (
+      <Stack key={step.id} direction="row" columnGap={1}>
+        <Controller
+          name={`directionsArray.${index}.step`}
+          control={control}
+          render={({ field }) => (
+            <RecipeEditTextField
+              {...field}
+              id="recipe-directions"
+              label={`Step ${index + 1}`}
+              sx={{ flex: "1" }}
+            />
+          )}
+        />
+        <IconButton aria-label="Remove step" onClick={() => removeStep(index)}>
+          <Delete />
+        </IconButton>
+      </Stack>
+    );
+  });
+
+  const addStep = () => {
+    appendStep({ step: "" });
   };
 
-  const removeIngredient = (index: number) => {
-    remove(index);
+  const addIngredient = () => {
+    appendIngredient({ amount: "", unit: "", name: "" });
   };
 
   const onSubmit = (values: FormFields) => {
@@ -87,6 +126,7 @@ export default function RecipeForm({ mutate, recipe }: Props) {
       name: values.recipeName,
       description: values.recipeDescription,
       ingredients: values.fieldsArray,
+      directions: values.directionsArray,
       image: "",
     };
 
@@ -148,20 +188,11 @@ export default function RecipeForm({ mutate, recipe }: Props) {
             Add ingredient
           </Button>
         </Stack>
-        <Controller
-          name="recipeDirections"
-          control={control}
-          render={({ field }) => (
-            <RecipeEditTextField
-              {...field}
-              id="recipe-directions"
-              label="Recipe directions (optional)"
-              multiline
-              rows={4}
-              sx={{ mt: 2 }}
-            />
-          )}
-        />
+        <Typography variant="h6">Directions</Typography>
+        {recipeDirections}
+        <Button variant="outlined" onClick={addStep}>
+          Add step
+        </Button>
         {recipeError && <Alert severity="error">{recipeError.title}</Alert>}
         <Button type="submit" variant="contained" disabled={isLoading}>
           {isLoading ? <CircularProgress size={25} /> : "Save recipe"}

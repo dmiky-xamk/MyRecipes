@@ -22,7 +22,7 @@ public class RecipeDtoValidationTests
             new IngredientDto("Flour", "dl", "4")
         };
 
-        var recipe = new RecipeDto(string.Empty, string.Empty, string.Empty, ingredients);
+        var recipe = new RecipeDto(string.Empty, string.Empty, string.Empty, ingredients, Enumerable.Empty<DirectionDto>());
 
         var result = _validator.TestValidate(recipe);
 
@@ -37,7 +37,7 @@ public class RecipeDtoValidationTests
             new IngredientDto(string.Empty, "dl", "4")
         };
 
-        var recipe = new RecipeDto("Test", string.Empty, string.Empty, ingredients);
+        var recipe = new RecipeDto("Test", string.Empty, string.Empty, ingredients, Enumerable.Empty<DirectionDto>());
 
 
         var result = _validator.TestValidate(recipe);

@@ -1,4 +1,5 @@
-﻿using MyRecipes.Application.Ingredients;
+﻿using MyRecipes.Application.Entities;
+using MyRecipes.Application.Ingredients;
 using MyRecipes.Application.Recipes.Queries;
 using MyRecipes.Domain.Entities;
 
@@ -18,22 +19,43 @@ public static class RecipeMappingProfiles
     {
         return new IngredientEntity(recipeId, ingredient.Name.Trim(), ingredient.Unit.ToLower().Trim(), ingredient.Amount.Trim());
     }
+    
+    public static DirectionEntity ToDirectionEntity(this DirectionDto direction, string recipeId)
+    {
+        return new DirectionEntity(recipeId, direction.Step.Trim());
+    }
+    public static DirectionDto ToDirectionDto(this DirectionEntity direction)
+    {
+        return new DirectionDto(direction.Step);
+    }
 
     public static QueryRecipeDto ToQueryRecipeDto(this RecipeEntity recipe)
     {
         var ingredients = recipe.Ingredients.Select(ing => ing.ToIngredientDto());
-        return new QueryRecipeDto(recipe.Id.ToString(), recipe.Name, recipe.Description, recipe.Image, ingredients);
+        var directions = recipe.Directions.Select(dir => dir.ToDirectionDto());
+
+        return new QueryRecipeDto(recipe.Id.ToString(), recipe.Name, recipe.Description, recipe.Image, ingredients, directions);
     }
 
     public static RecipeEntity ToRecipeEntity(this RecipeDto recipe, string recipeId, string userId)
     {
-        var ingredients = recipe.Ingredients.Select(ing => ing.ToIngredientEntity(recipeId)).ToList();
+        var ingredients = recipe.Ingredients
+            .Select(ing => ing.ToIngredientEntity(recipeId))
+            .ToList();
+
+        // Filter our empty steps, no need to save them to the database.
+        var directions = recipe.Directions
+            .Where(dir => !string.IsNullOrWhiteSpace(dir.Step))
+            .Select(dir => dir.ToDirectionEntity(recipeId))
+            .ToList();
+
         return new RecipeEntity()
         {
             Id = recipeId,
             UserId = userId,
             Name = recipe.Name.Trim(),
             Ingredients = ingredients,
+            Directions = directions,
             Description = recipe.Description.Trim(),
         };
     }

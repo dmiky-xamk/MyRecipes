@@ -7,4 +7,5 @@ public record RecipeDto(
     string Name,
     string Description,
     string Image,
-    IEnumerable<IngredientDto> Ingredients);
+    IEnumerable<IngredientDto> Ingredients,
+    IEnumerable<DirectionDto> Directions);

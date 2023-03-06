@@ -1,4 +1,5 @@
-﻿using MyRecipes.Application.Infrastructure.Persistence;
+﻿using MyRecipes.Application.Entities;
+using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Domain.Entities;
 
 namespace MyRecipes.Infrastructure.Persistence;
@@ -15,9 +16,10 @@ public class SqliteCrud : ICrud
 
     public async Task<IEnumerable<RecipeEntity>> GetFullRecipesAsync(string userId)
     {
-        string sql = "SELECT r.Id, r.UserId, r.Name, r.Description, r.Image, i.Id, i.RecipeId, i.Name, i.Unit, i.Amount" +
+        string sql = "SELECT r.Id, r.UserId, r.Name, r.Description, r.Image, i.Id AS IngredientId, i.RecipeId, i.Name, i.Unit, i.Amount, d.Id AS DirectionId, d.Step" +
                     " FROM Recipe r" +
                     " INNER JOIN Ingredient i on i.RecipeId = r.Id" +
+                    " INNER JOIN Direction d on d.RecipeId = r.Id" +
                     " WHERE r.UserId = @UserId";
 
         return await _db.QueryRecipes<dynamic>(sql, new { UserId = userId });
@@ -25,9 +27,10 @@ public class SqliteCrud : ICrud
 
     public async Task<RecipeEntity?> GetFullRecipeAsync(string recipeId, string userId)
     {
-        string sql = "SELECT r.Id, r.UserId, r.Name, r.Description, r.Image, i.Id, i.RecipeId, i.Name, i.Unit, i.Amount" +
+        string sql = "SELECT r.Id, r.UserId, r.Name, r.Description, r.Image, i.Id, i.RecipeId, i.Name, i.Unit, i.Amount, d.Step" +
                     " FROM Recipe r" +
                     " INNER JOIN Ingredient i on i.RecipeId = r.Id" +
+                    " INNER JOIN Direction d on d.RecipeId = r.Id" +
                     " WHERE i.RecipeId = @RecipeId AND r.UserId = @UserId";
 
         return (await _db.QueryRecipes<dynamic>(sql, new { RecipeId = recipeId, UserId = userId }))
@@ -50,6 +53,14 @@ public class SqliteCrud : ICrud
         await _db.ExecuteStatement(sql, ingredients);
     }
 
+    public async Task CreateDirectionsAsync(IEnumerable<DirectionEntity> directions)
+    {
+        string sql = "INSERT INTO Direction (RecipeId, Step)" +
+                    " VALUES (@RecipeId, @Step);";
+
+        await _db.ExecuteStatement(sql, directions);
+    }
+
     public async Task<int> UpdateRecipeAsync(RecipeEntity recipe)
     {
         string sql = "UPDATE Recipe SET Name = @Name, Description = @Description, Image = @Image" +
@@ -58,14 +69,24 @@ public class SqliteCrud : ICrud
         return await _db.ExecuteStatement(sql, new { recipe.Id, recipe.UserId, recipe.Name, recipe.Description, recipe.Image });
     }
 
-    public async Task UpdateIngredientsAsync(IEnumerable<IngredientEntity> ingredients)
+    public async Task UpdateIngredientsAsync(IEnumerable<IngredientEntity> ingredients, string recipeId)
     {
         string sql = "DELETE FROM Ingredient" +
                     " WHERE RecipeId = @RecipeId";
 
-        await _db.ExecuteStatement(sql, new { ingredients.First().RecipeId });
+        await _db.ExecuteStatement(sql, new { RecipeId = recipeId });
 
         await CreateIngredientsAsync(ingredients);
+    }
+
+    public async Task UpdateDirectionsAsync(IEnumerable<DirectionEntity> directions, string recipeId)
+    {
+        string sql = "DELETE FROM Direction" +
+                    " WHERE RecipeId = @RecipeId";
+
+        await _db.ExecuteStatement(sql, new { recipeId });
+
+        await CreateDirectionsAsync(directions);
     }
 
     public async Task<int> DeleteRecipeAsync(string id, string userId)

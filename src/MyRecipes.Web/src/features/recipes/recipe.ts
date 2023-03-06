@@ -7,6 +7,11 @@ export interface Recipe {
   description: string;
   image: string;
   ingredients: Ingredient[];
+  directions: Direction[];
+}
+
+export interface Direction {
+  step: string;
 }
 
 export interface Ingredient {
@@ -25,12 +30,8 @@ export interface MatchedRecipe {
 export interface FormFields {
   recipeName: string;
   recipeDescription: string;
-  recipeDirections: string;
-  fieldsArray: {
-    name: string;
-    amount: string;
-    unit: string;
-  }[];
+  fieldsArray: Ingredient[];
+  directionsArray: Direction[];
 }
 
 interface ApiErrorResponse {

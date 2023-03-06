@@ -40,7 +40,8 @@ public class UpdateRecipe
                 return Result<Unit>.Failure("Failed to update the recipe.");
             }
 
-            await _db.UpdateIngredientsAsync(recipe.Ingredients);
+            await _db.UpdateIngredientsAsync(recipe.Ingredients, recipe.Id);
+            await _db.UpdateDirectionsAsync(recipe.Directions, recipe.Id);
 
             return Result<Unit>.Success(Unit.Value);
         }

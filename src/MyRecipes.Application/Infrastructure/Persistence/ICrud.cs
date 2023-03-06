@@ -1,4 +1,5 @@
-﻿using MyRecipes.Domain.Entities;
+﻿using MyRecipes.Application.Entities;
+using MyRecipes.Domain.Entities;
 
 namespace MyRecipes.Application.Infrastructure.Persistence;
 
@@ -11,12 +12,15 @@ public interface ICrud
     /// <returns>The number of rows affected.</returns>
     Task CreateIngredientsAsync(IEnumerable<IngredientEntity> ingredient);
     Task<int> CreateRecipeAsync(RecipeEntity recipe);
+    Task CreateDirectionsAsync(IEnumerable<DirectionEntity> directions);
 
     Task<IEnumerable<RecipeEntity>> GetFullRecipesAsync(string userId);
     Task<RecipeEntity?> GetFullRecipeAsync(string recipeId, string userId);
 
     Task<int> UpdateRecipeAsync(RecipeEntity recipe);
-    Task UpdateIngredientsAsync(IEnumerable<IngredientEntity> ingredients);
+    Task UpdateIngredientsAsync(IEnumerable<IngredientEntity> ingredients, string recipeId);
+    Task UpdateDirectionsAsync(IEnumerable<DirectionEntity> directions, string recipeId);
+
 
     /// <summary>
     /// Delete a recipe along with its ingredients.

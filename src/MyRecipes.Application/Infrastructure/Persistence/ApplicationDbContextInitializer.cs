@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyRecipes.Application.Entities;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Domain.Entities;
 using MyRecipes.Infrastructure.Identity;
@@ -97,11 +98,21 @@ public class ApplicationDbContextInitializer
             	PRIMARY KEY (id),
                 CONSTRAINT fk_recipe FOREIGN KEY(recipe_id) REFERENCES recipe(id) ON DELETE CASCADE);
             """;
+        
+        var sqlDirection = """
+                CREATE TABLE IF NOT EXISTS direction ( 
+            	id SERIAL,
+            	step Text NOT NULL DEFAULT '',
+            	recipe_id Text NOT NULL,
+            	PRIMARY KEY (id),
+                CONSTRAINT fk_recipe FOREIGN KEY(recipe_id) REFERENCES recipe(id) ON DELETE CASCADE);
+            """;
 
         await _dataAccess.ExecuteStatement(sqlRecipe, new { });
         await _dataAccess.ExecuteStatement(sqlIngredient, new { });
+        await _dataAccess.ExecuteStatement(sqlDirection, new { });
 
-        var userId = _userManager.Users.First().Id;
+        var userId = _userManager.Users.First(u => u.Email == "test@test.com").Id;
         var recipes = await _db.GetFullRecipesAsync(userId);
 
         if (!recipes.Any())
@@ -114,14 +125,21 @@ public class ApplicationDbContextInitializer
                 UserId = userId,
                 Ingredients = new List<IngredientEntity>()
                 {
-                    new IngredientEntity() { RecipeId = "123", Name = "Vettä", Amount = "2 1/2", Unit = "dl"  },
-                    new IngredientEntity() { RecipeId = "123", Name = "Kaurahiutaleita", Amount = "1", Unit = "dl" },
-                    new IngredientEntity() { RecipeId = "123", Name = "Suolaa", Amount = "2", Unit = "tl" },
+                    new IngredientEntity("123", "Vettä", "dl", "2 1/2"),
+                    new IngredientEntity("123", "Kaurahiutaleita", "dl", "1"),
+                    new IngredientEntity("123", "Suolaa", "tl", "2"),
                 },
+                Directions = new List<DirectionEntity>()
+                {
+                    new DirectionEntity("123", "Kiehauta vesi"),
+                    new DirectionEntity("123", "Lisää kaurahiutaleet"),
+                    new DirectionEntity("123", "Anna kiehua hitaasti kunnes mieleistä")
+                }
             };
 
             await _db.CreateRecipeAsync(recipe);
             await _db.CreateIngredientsAsync(recipe.Ingredients);
+            await _db.CreateDirectionsAsync(recipe.Directions);
         }
     }
 }

@@ -23,7 +23,5 @@ public class IngredientEntity
     public required string RecipeId { get; set; }
     public required string Name { get; set; }
     public string Unit { get; set; } = string.Empty;
-
-    // TODO: Convert to a string or a double.
     public string Amount { get; set; } = string.Empty;
 }

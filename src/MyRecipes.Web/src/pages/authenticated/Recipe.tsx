@@ -1,5 +1,13 @@
 import { AddShoppingCart, Edit } from "@mui/icons-material";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useRecipe } from "../../features/recipes/recipe";
 import RecipePlaceholderImage from "../../features/recipes/RecipePlaceholderImage";
@@ -28,11 +36,21 @@ export default function Recipe() {
   }
 
   // TODO: Different key?
-  const ingredients = recipe!.ingredients.map((ingredient) => {
+  const ingredients = recipe!.ingredients.map((ingredient, index) => {
     return (
-      <Typography key={ingredient.name}>
-        {ingredient.amount} {ingredient.unit} {ingredient.name}
-      </Typography>
+      <ListItem key={index} disablePadding>
+        <ListItemText
+          primary={`${ingredient.amount} ${ingredient.unit} ${ingredient.name}`}
+        />
+      </ListItem>
+    );
+  });
+
+  const directions = recipe?.directions.map((direction, index) => {
+    return (
+      <ListItem key={index} disableGutters sx={{ display: "list-item" }}>
+        {direction.step}
+      </ListItem>
     );
   });
 
@@ -65,13 +83,21 @@ export default function Recipe() {
               <AddShoppingCart />
             </IconButton>
           </Stack>
-          <Stack gap={0.2}>{ingredients}</Stack>
+          <List disablePadding>{ingredients}</List>
         </Box>
         <Box>
           <Typography variant="h6" gutterBottom>
             Directions
           </Typography>
-          <Typography>Under construction...</Typography>
+          <List
+            component="ol"
+            sx={{
+              listStyleType: "number",
+              listStylePosition: "inside",
+            }}
+          >
+            {directions}
+          </List>
         </Box>
       </Stack>
     </PageContainer>

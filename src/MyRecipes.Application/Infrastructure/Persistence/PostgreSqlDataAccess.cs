@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Domain.Entities;
+using MyRecipes.Application.Entities;
 using System.Data;
 using Npgsql;
 
@@ -36,7 +37,7 @@ internal class PostgreSqlDataAccess : IDataAccess
             // All the recipes to return along with their ingredients will be added here.
             var recipeDictionary = new Dictionary<string, RecipeEntity>();
 
-            var recipes = await connection.QueryAsync<RecipeEntity, IngredientEntity, RecipeEntity>(sqlStatement, (recipe, ingredient) =>
+            var recipes = await connection.QueryAsync<RecipeEntity, IngredientEntity, DirectionEntity, RecipeEntity>(sqlStatement, (recipe, ingredient, direction) =>
             {
                 if (recipeDictionary.TryGetValue(recipe.Id, out RecipeEntity? existingRecipe))
                 {
@@ -48,11 +49,23 @@ internal class PostgreSqlDataAccess : IDataAccess
                     recipeDictionary.Add(recipe.Id, recipe);
                 }
 
-                recipe.Ingredients.Add(ingredient);
+                // Add ingredients that aren't in the list already.
+                if (!recipe.Ingredients.Any(i => i.Name == ingredient.Name))
+                {
+                    recipe.Ingredients.Add(ingredient);
+                }
+                
+                // Database doesn't allow empty or whitespace direction steps, but when
+                // mapping, Dapper creates 'DirectionEntity' which has a empty string as default value for 'Step'.
+                // Rather than returning list with empty steps, we return an empty list.
+                if (direction.Step.Length != 0 && !recipe.Directions.Any(d => d.Step == direction.Step))
+                {
+                    recipe.Directions.Add(direction);
+                }
 
                 return recipe;
             },
-            splitOn: "Id",
+            splitOn: "IngredientId, DirectionId",
             param: parameters);
 
             return recipeDictionary.Values;

@@ -1,4 +1,5 @@
-﻿using MyRecipes.Domain.Entities;
+﻿using MyRecipes.Application.Entities;
+using MyRecipes.Domain.Entities;
 
 namespace MyRecipes.Application.Infrastructure.Persistence;
 
@@ -14,10 +15,12 @@ public class PostgreSqlCrud : ICrud
     public async Task<IEnumerable<RecipeEntity>> GetFullRecipesAsync(string userId)
     {
         string sql = """
-                    SELECT r.id, r.user_id, r.name, r.description, r.image, i.id, i.recipe_id, i.name, i.unit, i.amount
+                    SELECT r.id, r.user_id, r.name, r.description, r.image, i.id AS IngredientId, i.recipe_id, i.name, i.unit, i.amount, d.id AS DirectionId, d.step
                     FROM recipe r
-                    inner join ingredient i ON i.recipe_id = r.id
+                    INNER JOIN ingredient i on i.recipe_id = r.id
+                    LEFT OUTER JOIN direction d ON d.recipe_id = r.id
                     WHERE r.user_id = @UserId
+                    ORDER by r.id, i.id, d.id;
                     """;
 
         return await _db.QueryRecipes<dynamic>(sql, new { UserId = userId });
@@ -25,10 +28,12 @@ public class PostgreSqlCrud : ICrud
 
     public async Task<RecipeEntity?> GetFullRecipeAsync(string recipeId, string userId)
     {
-        string sql = "SELECT r.id, r.user_id, r.name, r.description, r.image, i.id, i.recipe_id, i.name, i.unit, i.amount" +
+        string sql = "SELECT r.id, r.user_id, r.name, r.description, r.image, i.id AS IngredientId, i.recipe_id, i.name, i.unit, i.amount, d.id AS DirectionId, d.step" +
                     " FROM recipe r" +
                     " INNER JOIN ingredient i on i.recipe_id = r.id" +
-                    " WHERE i.recipe_id = @RecipeId AND r.user_id = @UserId";
+                    " LEFT OUTER JOIN direction d ON d.recipe_id = r.id" +
+                    " WHERE i.recipe_id = @RecipeId AND r.user_id = @UserId" +
+                    " ORDER by r.id, i.id, d.id;";
 
         return (await _db.QueryRecipes<dynamic>(sql, new { RecipeId = recipeId, UserId = userId }))
             .FirstOrDefault();
@@ -50,6 +55,14 @@ public class PostgreSqlCrud : ICrud
         await _db.ExecuteStatement(sql, ingredients);
     }
 
+    public async Task CreateDirectionsAsync(IEnumerable<DirectionEntity> directions)
+    {
+        string sql = "INSERT INTO direction (recipe_id, step)" +
+                    " VALUES (@RecipeId, @Step);";
+
+        await _db.ExecuteStatement(sql, directions);
+    }
+
     public async Task<int> UpdateRecipeAsync(RecipeEntity recipe)
     {
         string sql = "UPDATE Recipe SET name = @Name, description = @Description, image = @Image" +
@@ -58,14 +71,24 @@ public class PostgreSqlCrud : ICrud
         return await _db.ExecuteStatement(sql, new { recipe.Id, recipe.UserId, recipe.Name, recipe.Description, recipe.Image });
     }
 
-    public async Task UpdateIngredientsAsync(IEnumerable<IngredientEntity> ingredients)
+    public async Task UpdateIngredientsAsync(IEnumerable<IngredientEntity> ingredients, string recipeId)
     {
         string sql = "DELETE FROM ingredient" +
                     " WHERE recipe_id = @RecipeId";
 
-        await _db.ExecuteStatement(sql, new { ingredients.First().RecipeId });
+        await _db.ExecuteStatement(sql, new { RecipeId = recipeId });
 
         await CreateIngredientsAsync(ingredients);
+    }
+
+    public async Task UpdateDirectionsAsync(IEnumerable<DirectionEntity> directions, string recipeId)
+    {
+        string sql = "DELETE FROM direction" +
+                    " WHERE recipe_id = @RecipeId";
+
+        await _db.ExecuteStatement(sql, new { RecipeId = recipeId });
+
+        await CreateDirectionsAsync(directions);
     }
 
     public async Task<int> DeleteRecipeAsync(string id, string userId)

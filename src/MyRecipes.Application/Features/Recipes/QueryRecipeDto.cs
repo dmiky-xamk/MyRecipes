@@ -10,4 +10,5 @@ public record QueryRecipeDto(
     string Name,
     string Description,
     string Image,
-    IEnumerable<IngredientDto> Ingredients) : RecipeDto(Name, Description, Image, Ingredients);
+    IEnumerable<IngredientDto> Ingredients,
+    IEnumerable<DirectionDto> Directions) : RecipeDto(Name, Description, Image, Ingredients, Directions);

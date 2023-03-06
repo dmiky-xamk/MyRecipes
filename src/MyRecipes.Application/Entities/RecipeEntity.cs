@@ -1,4 +1,6 @@
-﻿namespace MyRecipes.Domain.Entities;
+﻿using MyRecipes.Application.Entities;
+
+namespace MyRecipes.Domain.Entities;
 
 public class RecipeEntity
 {
@@ -8,5 +10,6 @@ public class RecipeEntity
     public string Description { get; set; } = string.Empty;
     public string Image { get; set; } = string.Empty;
     public List<IngredientEntity> Ingredients { get; set; } = new();
+    public List<DirectionEntity> Directions { get; set; } = new();
 
 }

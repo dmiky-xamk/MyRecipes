@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MyRecipes.Application.Common.Models;
-using System.Net;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace MyRecipes.API.Controllers;
 
@@ -12,31 +11,46 @@ public abstract class ApiBaseController : ControllerBase
 
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
+    // Return a better formatted error (https://blog.frankel.ch/structured-errors-http-apis/)
+    // https://stackoverflow.com/questions/63301306/add-detail-message-to-asp-net-core-3-1-standard-json-badrequest-response
+
     /// <summary>
-    /// Map the <paramref name="result"/> to an appropriate HTTP response.
+    /// Creates an <see cref="ObjectResult"/> that produces a <see cref="ProblemDetails"/> response with a <see cref="StatusCodes.Status401Unauthorized"/> status code.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="result"></param>
-    /// <returns>A HTTP response of type <typeparamref name="IActionResult"/>.</returns>
-    protected IActionResult HandleResult<T>(Result<T>? result)
+    /// <param name="title">Message for the <see cref="ProblemDetails"/> title property.</param>
+    /// <returns>The created <see cref="ObjectResult"/> for the response.</returns>
+    protected IActionResult UnauthorizedProblem(string title)
     {
-        if (result is null)
-        {
-            return NotFound();
-        }
+        return Problem(title: title, statusCode: StatusCodes.Status401Unauthorized);
+    }
 
-        if (result.IsSuccess && result.Value is null)
-        {
-            return NotFound();
-        }
+    /// <summary>
+    /// Creates an <see cref="ObjectResult"/> that produces a <see cref="ProblemDetails"/> response with a <see cref="StatusCodes.Status409Conflict"/> status code.
+    /// </summary>
+    /// <param name="title">Message for the <see cref="ProblemDetails"/> title property.</param>
+    /// <returns>The created <see cref="ObjectResult"/> for the response.</returns>
+    protected IActionResult ConflictProblem(string title)
+    {
+        return Problem(title: title, statusCode: StatusCodes.Status409Conflict);
+    }
 
-        if (result.IsSuccess && result.Value is not null)
-        {
-            return Ok(result.Value);
-        }
+    /// <summary>
+    /// Creates an <see cref="ActionResult"/> that produces a <see cref="StatusCodes.Status422UnprocessableEntity"/> response with a <see cref="ValidationProblemDetails"/> value.
+    /// </summary>
+    /// <param name="modelState">The <see cref="ModelStateDictionary"/>.</param>
+    /// <returns>The created <see cref="ActionResult"/> for the response.</returns>
+    protected IActionResult UnprocessableEntityProblem(ModelStateDictionary modelState)
+    {
+        return ValidationProblem(modelStateDictionary: modelState, statusCode: StatusCodes.Status422UnprocessableEntity);
+    }
 
-        // Return a better formatted error (https://blog.frankel.ch/structured-errors-http-apis/)
-        // https://stackoverflow.com/questions/63301306/add-detail-message-to-asp-net-core-3-1-standard-json-badrequest-response
-        return Problem(title: result.Error, statusCode: (int)HttpStatusCode.BadRequest);
+    /// <summary>
+    /// Creates an <see cref="ObjectResult"/> that produces a <see cref="ProblemDetails"/> response with a <see cref="StatusCodes.Status500InternalServerError"/> status code.
+    /// </summary>
+    /// <param name="title">Message for the <see cref="ProblemDetails"/> title property.</param>
+    /// <returns>The created <see cref="ObjectResult"/> for the response.</returns>
+    protected IActionResult ServerProblem(string title)
+    {
+        return Problem(title: title, statusCode: StatusCodes.Status500InternalServerError);
     }
 }

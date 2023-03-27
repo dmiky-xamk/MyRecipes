@@ -18,4 +18,7 @@ public class CurrentUserService : ICurrentUserService
 
     public string? Email
         => _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
+
+    public string? Token
+        => _httpContextAccessor.HttpContext?.Request.Headers.Authorization;
 }

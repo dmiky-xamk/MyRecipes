@@ -1,4 +1,5 @@
-using MyRecipes.Api;
+using MyRecipes.API.Extensions;
+using MyRecipes.API.Mapping;
 using MyRecipes.Application;
 using MyRecipes.Infrastructure;
 using MyRecipes.Infrastructure.Persistence;
@@ -29,7 +30,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var initializer = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitializer>();
+    var initializer = scope.ServiceProvider.GetRequiredService<IApplicationDbContextInitializer>();
     await initializer.InitializeAsync();
     await initializer.SeedAsync();
 }
@@ -44,6 +45,12 @@ if (app.Environment.IsDevelopment())
         // https://github.com/TryCatchLearn/Restore/blob/0da0ea7fcab7d6d4d1ba79b5d37c1fdab0cd8927/API/Program.cs
         opt.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
     });
+
+    app.ConfigureExceptionHandler(includeDetails: true);
+} 
+else
+{
+    app.ConfigureExceptionHandler(includeDetails: false);
 }
 
 app.UseCors("CorsPolicy");
@@ -56,3 +63,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

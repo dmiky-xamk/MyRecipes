@@ -7,6 +7,9 @@ public enum AuthError
     Unknown
 }
 
+/// <summary>
+/// The error response from the authentication endpoint when the authentication fails.
+/// </summary>
 public class AuthenticationError
 {
     public AuthenticationError(AuthError errorType, string errorMessage)

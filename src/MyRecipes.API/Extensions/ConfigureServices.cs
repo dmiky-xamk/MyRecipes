@@ -1,11 +1,8 @@
-﻿using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MyRecipes.API;
 using MyRecipes.API.Features.Auth;
 using MyRecipes.Application.Features.Auth;
 using MyRecipes.Infrastructure.Identity;
@@ -13,14 +10,13 @@ using MyRecipes.Infrastructure.Persistence;
 using System.Reflection;
 using System.Text;
 
-namespace MyRecipes.Api;
+namespace MyRecipes.API.Extensions;
 
 public static class ConfigureServices
 {
     public static IServiceCollection AddAPIServices(this IServiceCollection services, ConfigurationManager config)
     {
-        services.AddControllers()
-            .AddFluentValidation();
+        services.AddControllers();
 
         services.ConfigureAPIVersioning();
         services.ConfigureSwaggerVersioning();
@@ -128,7 +124,7 @@ public static class ConfigureServices
                 };
             });
 
-        services.AddScoped<ApplicationDbContextInitializer>();
+        services.AddScoped<IApplicationDbContextInitializer, ApplicationDbContextInitializer>();
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddScoped<ITokenService, TokenService>();
 

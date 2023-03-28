@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using MyRecipes.Application.Entities;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Domain.Entities;
+using Npgsql;
 using System.Data;
 using System.Data.SQLite;
 
@@ -102,6 +103,14 @@ internal class SqliteDataAccess : IDataAccess
         using (IDbConnection connection = new SQLiteConnection(_connectionString))
         {
             return await connection.ExecuteAsync(sqlStatement, parameters);
+        }
+    }
+
+    public async Task<bool> ExecuteScalar<T>(string sqlStatement, T parameters)
+    {
+        using (IDbConnection connection = new NpgsqlConnection(_connectionString))
+        {
+            return await connection.ExecuteScalarAsync<bool>(sqlStatement, parameters);
         }
     }
 }

@@ -98,4 +98,18 @@ public class SqliteCrud : ICrud
 
         return await _db.ExecuteStatement(sql, new { Id = id, UserId = userId });
     }
+
+    public async Task<bool> CheckIfRecipeExists(string id, string userId)
+    {
+        string sql = """
+            SELECT CAST(CASE WHEN EXISTS 
+            (
+                SELECT 1 FROM recipe
+                WHERE Id = @Id AND UserId = @UserId
+            )
+            THEN 1 ELSE 0 END as BIT)";
+            """;
+
+        return await _db.ExecuteScalar(sql, new { Id = id, UserId = userId });
+    }
 }

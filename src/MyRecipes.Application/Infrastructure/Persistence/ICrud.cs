@@ -21,6 +21,8 @@ public interface ICrud
     Task UpdateIngredientsAsync(IEnumerable<IngredientEntity> ingredients, string recipeId);
     Task UpdateDirectionsAsync(IEnumerable<DirectionEntity> directions, string recipeId);
 
+    Task<bool> CheckIfRecipeExists(string id, string userId);
+
 
     /// <summary>
     /// Delete a recipe along with its ingredients.

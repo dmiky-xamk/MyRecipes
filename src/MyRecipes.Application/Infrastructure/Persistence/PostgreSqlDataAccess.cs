@@ -1,25 +1,38 @@
 ﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using MyRecipes.Application.Entities;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Domain.Entities;
-using MyRecipes.Application.Entities;
-using System.Data;
 using Npgsql;
+using System.Data;
 
 namespace MyRecipes.Infrastructure.Persistence;
 
 /// <summary>
-/// Handles the direct contact with the Sqlite database.
+/// Handles the direct contact with the Postgre database.
 /// </summary>
 internal class PostgreSqlDataAccess : IDataAccess
 {
-    private readonly IConfiguration _config;
     private readonly string _connectionString;
+    private readonly IServiceProvider _serviceProvider;
 
-    public PostgreSqlDataAccess(IConfiguration config)
+    public PostgreSqlDataAccess(IServiceProvider serviceProvider)
     {
-        _config = config;
-        _connectionString = ParseConnectionString() ?? _config.GetConnectionString("Postgre");
+        _serviceProvider = serviceProvider;
+        _connectionString = GetConnectionString();
+    }
+
+    private string GetConnectionString()
+    {
+        using var scope = _serviceProvider.CreateScope();
+
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        string? connectionString = dbContext.Database.GetConnectionString();
+
+        return connectionString ?? throw new Exception("dbContext connection string was null");
     }
 
     /// <summary>
@@ -31,7 +44,6 @@ internal class PostgreSqlDataAccess : IDataAccess
     /// <returns>An IEnumerable of the recipes that matched the parameters.</returns>
     public async Task<IEnumerable<RecipeEntity>> QueryRecipes<T>(string sqlStatement, T parameters)
     {
-        // TODO: Create RecipeDataAccess?
         using (IDbConnection connection = new NpgsqlConnection(_connectionString))
         {
             // All the recipes to return along with their ingredients will be added here.
@@ -43,7 +55,6 @@ internal class PostgreSqlDataAccess : IDataAccess
                 {
                     recipe = existingRecipe;
                 }
-
                 else
                 {
                     recipeDictionary.Add(recipe.Id, recipe);
@@ -54,7 +65,7 @@ internal class PostgreSqlDataAccess : IDataAccess
                 {
                     recipe.Ingredients.Add(ingredient);
                 }
-                
+
                 // Database doesn't allow empty or whitespace direction steps, but when
                 // mapping, Dapper creates 'DirectionEntity' which has a empty string as default value for 'Step'.
                 // Rather than returning list with empty steps, we return an empty list.
@@ -105,19 +116,11 @@ internal class PostgreSqlDataAccess : IDataAccess
         }
     }
 
-    private static string? ParseConnectionString()
+    public async Task<bool> ExecuteScalar<T>(string sqlStatement, T parameters)
     {
-        string? pgHost = Environment.GetEnvironmentVariable("PGHOST");
-        string? pgPort = Environment.GetEnvironmentVariable("PGPORT");
-        string? pgUser = Environment.GetEnvironmentVariable("PGUSER");
-        string? pgPass = Environment.GetEnvironmentVariable("PGPASSWORD");
-        string? pgDb = Environment.GetEnvironmentVariable("PGDATABASE");
-
-        if (Enumerable.Any(new string?[] { pgHost, pgPort, pgUser, pgPass, pgDb }, s => s is null))
+        using (IDbConnection connection = new NpgsqlConnection(_connectionString))
         {
-            return null;
-        };
-
-        return $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}; SSL Mode=Require; Trust Server Certificate=true";
+            return await connection.ExecuteScalarAsync<bool>(sqlStatement, parameters);
+        }
     }
 }

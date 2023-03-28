@@ -19,7 +19,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { ApiErrorResponse } from "../../api/agent";
 import { UseMutationResult } from "@tanstack/react-query";
-import { User } from "./auth";
+import { User, ValidationErrorResponse } from "./auth";
 
 const RegisterModeText = {
   submitButtonText: "Register",
@@ -44,7 +44,7 @@ interface Props {
   authMode: "register" | "login";
   handleAuth: UseMutationResult<
     User | null,
-    ApiErrorResponse,
+    ValidationErrorResponse,
     AuthCredentials,
     unknown
   >;

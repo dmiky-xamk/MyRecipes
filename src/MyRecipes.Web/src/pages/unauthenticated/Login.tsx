@@ -4,16 +4,14 @@ import AuthForm from "../../features/auth/AuthForm";
 import PageContainer from "../../features/ui/main/PageContainer";
 
 export default function Login() {
-  const mutate = useLogin({
-    retry: 0,
-  });
+  const login = useLogin();
 
   return (
     <PageContainer maxWidth="xs" center={true}>
       <Typography variant="h5" mb={4}>
         Sign in to an existing account
       </Typography>
-      <AuthForm authMode="login" handleAuth={mutate} />
+      <AuthForm authMode="login" handleAuth={login} />
     </PageContainer>
   );
 }

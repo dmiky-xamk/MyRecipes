@@ -29,7 +29,7 @@ const RecipeEditTextField = styled(TextField)({
 });
 
 interface Props {
-  mutate: UseMutationResult<any, RecipeErrorResponse, Recipe, void>;
+  mutate: UseMutationResult<Recipe, RecipeErrorResponse, Recipe>;
   recipe?: Recipe;
 }
 

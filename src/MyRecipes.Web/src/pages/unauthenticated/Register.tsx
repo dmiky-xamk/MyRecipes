@@ -4,16 +4,14 @@ import AuthForm from "../../features/auth/AuthForm";
 import PageContainer from "../../features/ui/main/PageContainer";
 
 export default function Register() {
-  const mutate = useRegister({
-    retry: 1,
-  });
+  const register = useRegister();
 
   return (
     <PageContainer maxWidth="xs" center={true}>
       <Typography variant="h5" mb={4}>
         Create a new account
       </Typography>
-      <AuthForm authMode="register" handleAuth={mutate} />
+      <AuthForm authMode="register" handleAuth={register} />
     </PageContainer>
   );
 }

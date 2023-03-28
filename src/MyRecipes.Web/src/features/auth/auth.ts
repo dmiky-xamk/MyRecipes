@@ -1,5 +1,12 @@
-import { configureAuth } from "react-query-auth";
+import {
+  QueryClient,
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import agent, { ApiErrorResponse, updateAxiosToken } from "../../api/agent";
+import { Recipe } from "../recipes/recipe";
 
 export interface AuthCredentials {
   email: string;
@@ -7,66 +14,129 @@ export interface AuthCredentials {
 }
 
 export interface User {
-  token: string;
+  email: string;
 }
 
-const userFn = async (): Promise<User | null> => {
-  const token = localStorage.getItem("token");
+export interface AuthResponse {
+  token: string;
+  email: string;
+  recipes: Recipe[];
+}
 
-  if (token) {
-    updateAxiosToken(token);
-    return agent.Account.user().then(
-      // Token is valid, the user is authenticated.
-      () => {
-        return { token: token };
+export interface ValidationErrorResponse extends ApiErrorResponse {
+  errors?: {
+    Email?: [];
+    Password?: [];
+  };
+}
+
+const handleResponse = (res: AuthResponse, queryClient: QueryClient) => {
+  // Update the token
+  updateAxiosToken(res.token);
+  localStorage.setItem("token", res.token);
+
+  // Update the cache
+  queryClient.setQueryData(["authenticated-user"], res.email);
+  queryClient.setQueryData(["recipes"], res.recipes);
+};
+
+const useLogin = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<User | null, ValidationErrorResponse, AuthCredentials>(
+    async (credentials: AuthCredentials) => {
+      const res = await agent.Account.login(credentials);
+      handleResponse(res, queryClient);
+
+      // Return the user
+      return { email: res.email };
+    },
+    {
+      retry: 0,
+
+      // Return the error so that the UI can show the information.
+      onError: (err: ValidationErrorResponse) => {
+        console.log("Error:", err);
+        return err;
       },
-      // Remove the token and return null if the token validation fails (API sends 401).
-      (_) => {
+    }
+  );
+};
+
+const useRegister = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<User | null, ValidationErrorResponse, AuthCredentials>(
+    async (credentials: AuthCredentials) => {
+      const res = await agent.Account.register(credentials);
+      handleResponse(res, queryClient);
+
+      // Return the user
+      return { email: res.email };
+    },
+    {
+      retry: 0,
+
+      // Return the error so that the UI can show the information.
+      onError: (err: ValidationErrorResponse) => err,
+    }
+  );
+};
+
+const useLogout = (
+  options?: UseMutationOptions<User | null, ValidationErrorResponse>
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<User | null, ValidationErrorResponse>(
+    async () => {
+      updateAxiosToken(null);
+      localStorage.removeItem("token");
+
+      queryClient.setQueryData(["authenticated-user"], null);
+      queryClient.setQueryData(["recipes"], null);
+
+      return null;
+    },
+    {
+      onSuccess: (user, ...rest) => {
+        options?.onSuccess?.(user, ...rest);
+      },
+    }
+  );
+};
+
+const useUser = () => {
+  const token = localStorage.getItem("token");
+  const queryClient = useQueryClient();
+
+  const {
+    data: user,
+    isInitialLoading: isLoading, // Breaking change in react-query 4.0: isLoading is true when the query is not enabled.
+    isError,
+    error,
+  } = useQuery<User | null, ValidationErrorResponse>(
+    ["authenticated-user"],
+    async () => {
+      updateAxiosToken(token);
+      const res = await agent.Account.user();
+
+      queryClient.setQueryData(["recipes"], res.recipes);
+
+      return { email: res.email };
+    },
+    {
+      enabled: !!token,
+      useErrorBoundary: false,
+      retry: false,
+      onError: (_) => {
         localStorage.removeItem("token");
         return null;
-      }
-    );
-  }
+      },
+    }
+  );
 
-  // Token doesn't exist, the user isn't authenticated.
-  return null;
+  return { user, isLoading, isError, error };
 };
 
-const handleAuthResponse = (token: string): User => {
-  updateAxiosToken(token);
-  localStorage.setItem("token", token);
-
-  // TODO: Get the recipes when logging in?
-  return { token: token };
-};
-
-const loginFn = async (credentials: AuthCredentials) => {
-  const token: string = await agent.Account.login(credentials);
-  return handleAuthResponse(token);
-};
-
-const registerFn = async (credentials: AuthCredentials) => {
-  const token: string = await agent.Account.register(credentials);
-  return handleAuthResponse(token);
-};
-
-const logoutFn = () => {
-  updateAxiosToken(null);
-  localStorage.removeItem("token");
-
-  return Promise.resolve();
-};
-
-const { useUser, useLogin, useRegister, useLogout, AuthLoader } = configureAuth<
-  User | null,
-  ApiErrorResponse,
-  AuthCredentials,
-  AuthCredentials
->({
-  userFn: () => userFn(),
-  loginFn: (credentials: AuthCredentials) => loginFn(credentials),
-  registerFn: (credentials: AuthCredentials) => registerFn(credentials),
-  logoutFn: () => logoutFn(),
-});
-
-export { useUser, useLogin, useRegister, useLogout, AuthLoader };
+export { useUser, useLogin, useRegister, useLogout };

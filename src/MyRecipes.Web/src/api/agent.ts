@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { AuthCredentials } from "../features/auth/auth";
+import { AuthCredentials, AuthResponse } from "../features/auth/auth";
 import { Recipe } from "../features/recipes/recipe";
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -10,18 +10,11 @@ const responseBody = (response: AxiosResponse) => response.data;
 export const updateAxiosToken = (token: string | null) =>
   (axios.defaults.headers.common.Authorization = `Bearer ${token}`);
 
-// TODO: Move to auth?
-interface ValidationError {
-  Email: [];
-  Password: [];
-}
-
 export interface ApiErrorResponse {
   status: number;
   title: string;
   traceId: string;
   type: string;
-  errors?: ValidationError;
 }
 
 const sleep = (delay: number) =>
@@ -69,9 +62,11 @@ const Recipes = {
 };
 
 const Account = {
-  user: () => requests.get("/account"),
-  login: (user: AuthCredentials) => requests.post("/account/login", user),
-  register: (user: AuthCredentials) => requests.post("/account/register", user),
+  user: (): Promise<AuthResponse> => requests.get("/account"),
+  login: (user: AuthCredentials): Promise<AuthResponse> =>
+    requests.post("/account/login", user),
+  register: (user: AuthCredentials): Promise<AuthResponse> =>
+    requests.post("/account/register", user),
 };
 
 const agent = {

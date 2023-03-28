@@ -28,7 +28,7 @@ const renderAppHook = <Result,>(hook: () => Result) => {
 };
 
 const user: User = {
-  token: "test",
+  email: "test@test.com",
 };
 
 const config = {

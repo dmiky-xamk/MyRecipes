@@ -1,5 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import agent from "../../api/agent";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import agent, { ApiErrorResponse } from "../../api/agent";
 
 export interface Recipe {
   id: string;
@@ -34,13 +39,6 @@ export interface FormFields {
   directionsArray: Direction[];
 }
 
-interface ApiErrorResponse {
-  status: number;
-  title: string;
-  traceId: string;
-  type: string;
-}
-
 export interface RecipeErrorResponse extends ApiErrorResponse {
   errors?: {
     Name?: [];
@@ -59,7 +57,7 @@ const useRecipes = () => {
 
     onSuccess: (recipes: Recipe[]) => {
       for (const recipe of recipes) {
-        queryClient.setQueryData(["recipe", recipe.id], recipe);
+        queryClient.setQueryData(["recipes", recipe.id], recipe);
       }
     },
   });
@@ -76,7 +74,7 @@ const useRecipe = (recipeId: string) => {
     isError,
     error,
   } = useQuery({
-    queryKey: ["recipe", recipeId],
+    queryKey: ["recipes", recipeId],
     queryFn: () => agent.Recipes.details(recipeId),
     retry: 0,
     useErrorBoundary: false, // ASETA TÄMÄ!!
@@ -86,7 +84,7 @@ const useRecipe = (recipeId: string) => {
 
     // onSuccess: (recipes: Recipe[]) => {
     //   for (const recipe of recipes) {
-    //     queryClient.setQueryData(["recipe", recipe.id], recipe);
+    //     queryClient.setQueryData(["recipes", recipe.id], recipe);
     //   }
     // },
   });
@@ -100,7 +98,7 @@ const useCreateRecipe = () => {
     {
       onSuccess: (newRecipe) => {
         console.log("Create recipe:", newRecipe);
-        //  queryClient.invalidateQueries(["recipe", recipe.id])
+        //  queryClient.invalidateQueries(["recipes", recipe.id])
       },
     }
   );
@@ -110,15 +108,69 @@ const useCreateRecipe = () => {
 const useUpdateRecipe = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<any, RecipeErrorResponse, Recipe, void>(
-    (recipe: Recipe) => agent.Recipes.update(recipe.id, recipe),
-    {
-      onSuccess: (newRecipe) => {
-        console.log("Update recipe:", newRecipe);
-        //  queryClient.invalidateQueries(["recipe", recipe.id])
-      },
-    }
-  );
+  return useMutation<
+    Recipe,
+    RecipeErrorResponse,
+    Recipe,
+    { previousRecipe: Recipe | undefined; newRecipe: Recipe }
+  >((recipe: Recipe) => agent.Recipes.update(recipe.id, recipe), {
+    onMutate: async (newRecipe: Recipe) => {
+      console.log("Begin optimistic update");
+      // Cancel any outgoing refetches
+      // (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ["recipes", newRecipe.id] });
+
+      // Snapshot the previous value
+      const previousRecipe = queryClient.getQueryData<Recipe>([
+        "recipes",
+        newRecipe.id,
+      ]);
+
+      console.log("Previous recipe:", previousRecipe);
+      console.log("Updated recipe:", newRecipe);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["recipes", newRecipe.id], newRecipe);
+      queryClient.setQueryData(["recipes"], (old: any) => {
+        return old.map((item: Recipe) => {
+          return item.id === newRecipe.id ? { ...item, ...newRecipe } : item;
+        });
+      });
+
+      // Return a context object with the snapshotted value
+      return { previousRecipe, newRecipe };
+    },
+    onError: (err, newRecipe, context) => {
+      console.log("onError optimistic update");
+      queryClient.setQueryData(
+        ["recipes", context?.newRecipe.id],
+        context?.previousRecipe
+      );
+    },
+    onSettled: (recipe: Recipe | undefined) => {
+      console.log("onSettled optimistic update");
+      queryClient.invalidateQueries(["recipes", recipe?.id]);
+    },
+  });
 };
+
+// React query optimistically updates the cache
+
+// async function onUpdateMutation(recipe: Recipe, queryClient: QueryClient) {
+//   // Cancel any outgoing refetches
+//   // (so they don't overwrite our optimistic update)
+//   await queryClient.cancelQueries({ queryKey: ["recipes"] });
+
+//   // Snapshot the previous value
+//   const previousTodos = queryClient.getQueryData(["recipes"]);
+
+//   // Optimistically update to the new value
+//   queryClient.setQueryData(["recipes"], (old: any) => [...old, newTodo]);
+
+//   // Return a context object with the snapshotted value
+//   return { previousTodos };
+
+//   return () => queryClient.setQueryData(["recipes"], previousItems);
+// }
 
 export { useRecipe, useRecipes, useCreateRecipe, useUpdateRecipe };

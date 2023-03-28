@@ -16,7 +16,6 @@ import ShoppingCart from "./pages/authenticated/ShoppingCart";
 import NotFound from "./pages/unauthenticated/NotFound";
 
 export default function AuthenticatedApp() {
-  // TODO: Populate when querying the user
   const { isLoading } = useRecipes();
   const navigate = useNavigate();
   const logout = useLogout({ onSuccess: () => navigate("/") });
@@ -33,7 +32,7 @@ export default function AuthenticatedApp() {
     <Stack flex={1}>
       <AppBar position="sticky" color="default">
         <Toolbar sx={{ justifyContent: "end" }}>
-          <Button color="inherit" onClick={logout.mutate}>
+          <Button color="inherit" onClick={() => logout.mutate()}>
             Log out
           </Button>
         </Toolbar>

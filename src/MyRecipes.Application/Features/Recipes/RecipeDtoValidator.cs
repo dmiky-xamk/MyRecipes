@@ -17,7 +17,7 @@ public class RecipeDtoValidator :
 
         RuleFor(rec => rec.Ingredients)
             .NotEmpty()
-            .WithMessage("Atleast one ingredient is required.");
+            .WithMessage("At least one ingredient is required.");
 
         RuleForEach(rec => rec.Ingredients)
             .ChildRules(ingredients =>

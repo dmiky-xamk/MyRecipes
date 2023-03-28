@@ -5,7 +5,6 @@ using MyRecipes.Application.Infrastructure.Identity;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Infrastructure.Identity;
 using MyRecipes.Infrastructure.Persistence;
-using System.Data.Common;
 
 namespace MyRecipes.Infrastructure;
 
@@ -26,9 +25,6 @@ public static class ConfigureServices
     {
         services.AddDbContext<ApplicationDbContext>(opt =>
         {
-            //opt.UseSqlite(config.GetConnectionString("Default"),
-            //    builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
-
             string? env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             if (env is null)
@@ -55,10 +51,7 @@ public static class ConfigureServices
                     throw new ApplicationException("Some of the database connection environment variables were null.");
                 }
 
-                else
-                {
-                    connectionString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}; SSL Mode=Require; Trust Server Certificate=true";
-                }
+                connectionString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb}; SSL Mode=Require; Trust Server Certificate=true";
             }
 
             opt.UseNpgsql(connectionString,

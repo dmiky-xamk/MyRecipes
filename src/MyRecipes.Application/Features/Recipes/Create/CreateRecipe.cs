@@ -1,34 +1,47 @@
-﻿using IdGen;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using IdGen;
 using MediatR;
-using MyRecipes.Application.Common.Models;
 using MyRecipes.Application.Features.Auth;
 using MyRecipes.Application.Infrastructure.Persistence;
+using MyRecipes.Application.Recipes.Queries;
 using MyRecipes.Domain.Entities;
+using OneOf;
+using OneOf.Types;
 
 namespace MyRecipes.Application.Features.Recipes.Create;
 
 public class CreateRecipe
 {
-    public class Command : IRequest<Result<Unit>>
+    public class Command : IRequest<OneOf<QueryRecipeDto, ValidationResult, Error<string>>>
     {
-        public required RecipeDto Recipe { get; set; }
+        public required RecipeDto Recipe { get; init; }
     }
 
-    public class Handler : IRequestHandler<Command, Result<Unit>>
+    public class Handler : IRequestHandler<Command, OneOf<QueryRecipeDto, ValidationResult, Error<string>>>
     {
         private readonly ICrud _db;
         private readonly IIdGenerator<long> _idGen;
         private readonly ICurrentUserService _userService;
+        private readonly IValidator<RecipeDto> _validator;
 
-        public Handler(ICrud db, IIdGenerator<long> idGen, ICurrentUserService userService)
+        public Handler(ICrud db, IIdGenerator<long> idGen, ICurrentUserService userService, IValidator<RecipeDto> validator)
         {
             _db = db;
             _idGen = idGen;
             _userService = userService;
+            _validator = validator;
         }
 
-        public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<QueryRecipeDto, ValidationResult, Error<string>>> Handle(Command request, CancellationToken cancellationToken)
         {
+            var validationResult = await _validator.ValidateAsync(request.Recipe, cancellationToken);
+
+            if (!validationResult.IsValid)
+            {
+                return validationResult;
+            }
+
             // Create the recipe Snowflake Id
             string recipeId = _idGen.CreateId().ToString();
             string userId = _userService.UserId!;
@@ -39,14 +52,14 @@ public class CreateRecipe
 
             if (affectedRows == 0)
             {
-                return Result<Unit>.Failure("Failed to create the recipe.");
+                // Log
+                return new Error<string>("An unexpected error happened while creating your recipe.");
             }
 
             await _db.CreateIngredientsAsync(recipe.Ingredients);
             await _db.CreateDirectionsAsync(recipe.Directions);
 
-            // TODO: Return the new recipe so that the client can navigate to it?
-            return Result<Unit>.Success(Unit.Value);
+            return recipe.ToQueryRecipeDto();
         }
     }
 }

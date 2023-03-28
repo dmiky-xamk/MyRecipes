@@ -1,39 +1,46 @@
 ﻿using MediatR;
-using MyRecipes.Application.Common.Models;
+using MyRecipes.Application.Features.Recipes;
 using MyRecipes.Application.Infrastructure.Identity;
+using MyRecipes.Application.Infrastructure.Persistence;
+using MyRecipes.Application.Users;
+using OneOf;
 
 namespace MyRecipes.Application.Features.Auth.Login;
 
 public class LoginUser
 {
-    public class Query : IRequest<Result<string, AuthError>>
+    public class Query : IRequest<OneOf<AuthResponse, AuthenticationError>>
     {
         public required LoginDto LoginDto { get; set; }
     }
 
-    public class Handler : IRequestHandler<Query, Result<string, AuthError>>
+    public class Handler : IRequestHandler<Query, OneOf<AuthResponse, AuthenticationError>>
     {
         private readonly IIdentityService _identityService;
         private readonly ITokenService _tokenService;
+        private readonly ICrud _db;
 
-        public Handler(IIdentityService identityService, ITokenService tokenService)
+        public Handler(IIdentityService identityService, ITokenService tokenService, ICrud db)
         {
             _identityService = identityService;
             _tokenService = tokenService;
+            _db = db;
         }
 
-        public async Task<Result<string, AuthError>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<OneOf<AuthResponse, AuthenticationError>> Handle(Query request, CancellationToken cancellationToken)
         {
             var result = await _identityService.LoginAsync(request.LoginDto);
 
-            if (result.IsSuccess)
-            {
-                string token = _tokenService.GenerateToken(request.LoginDto.Email, result.Value);
+            return await result.Match<Task<OneOf<AuthResponse, AuthenticationError>>>(
+                async userId => {
+                    var token = _tokenService.GenerateToken(request.LoginDto.Email, userId);
 
-                return Result<string, AuthError>.Success(token);
-            }
+                    var recipes = (await _db.GetFullRecipesAsync(userId))
+                        .Select(recipe => recipe.ToQueryRecipeDto());
 
-            return result;
+                    return new AuthResponse(token, request.LoginDto.Email, recipes);
+                    },
+                authError => Task.FromResult<OneOf<AuthResponse, AuthenticationError>>(authError));
         }
     }
 }

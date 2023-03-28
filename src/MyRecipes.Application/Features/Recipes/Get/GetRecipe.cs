@@ -1,19 +1,20 @@
 ﻿using MediatR;
-using MyRecipes.Application.Common.Models;
 using MyRecipes.Application.Features.Auth;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Application.Recipes.Queries;
+using OneOf;
+using OneOf.Types;
 
 namespace MyRecipes.Application.Features.Recipes.Get;
 
 public class GetRecipe
 {
-    public class Query : IRequest<Result<QueryRecipeDto>?>
+    public class Query : IRequest<OneOf<QueryRecipeDto, NotFound>>
     {
-        public required string Id { get; set; }
+        public required string Id { get; init; }
     }
 
-    public class Handler : IRequestHandler<Query, Result<QueryRecipeDto>?>
+    public class Handler : IRequestHandler<Query, OneOf<QueryRecipeDto, NotFound>>
     {
         private readonly ICrud _db;
         private readonly ICurrentUserService _userService;
@@ -24,7 +25,7 @@ public class GetRecipe
             _userService = userService;
         }
 
-        public async Task<Result<QueryRecipeDto>?> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<OneOf<QueryRecipeDto, NotFound>> Handle(Query request, CancellationToken cancellationToken)
         {
             string userId = _userService.UserId!;
 
@@ -32,10 +33,10 @@ public class GetRecipe
 
             if (recipe is null)
             {
-                return null;
+                return new NotFound();
             }
 
-            return Result<QueryRecipeDto>.Success(recipe.ToQueryRecipeDto());
+            return recipe.ToQueryRecipeDto();
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyRecipes.Application.Common.Models;
 using MyRecipes.Application.Features.Auth;
 using MyRecipes.Application.Features.Auth.Login;
 using MyRecipes.Application.Features.Auth.Register;
 using MyRecipes.Application.Infrastructure.Identity;
-using System.Security.Claims;
+using OneOf;
 
 namespace MyRecipes.Infrastructure.Identity;
 
@@ -20,11 +19,11 @@ public class IdentityService : IIdentityService
         _signInManager = signInManager;
     }
 
-    public async Task<Result<string, AuthError>> RegisterAsync(RegisterDto registerDto)
+    public async Task<OneOf<string, AuthenticationError>> RegisterAsync(RegisterDto registerDto)
     {
         if (await _userManager.Users.AnyAsync(x => x.Email.ToLower() == registerDto.Email.ToLower()))
         {
-            return Result<string, AuthError>.Failure("The email has already been taken.", AuthError.EmailAlreadyTaken);
+            return new AuthenticationError(AuthError.EmailAlreadyTaken, "The email has already been taken.");
         }
 
         var appUser = new ApplicationUser()
@@ -37,13 +36,14 @@ public class IdentityService : IIdentityService
 
         if (result.Succeeded)
         {
-            return Result<string, AuthError>.Success(appUser.Id);
+            return appUser.Id;
         }
 
-        return Result<string, AuthError>.Failure("An unexpected error occured during registration.", AuthError.Unknown);
+        // Log
+        return new AuthenticationError(AuthError.Unknown, "An unexpected error occured during registration.");
     }
 
-    public async Task<Result<string, AuthError>> LoginAsync(LoginDto loginDto)
+    public async Task<OneOf<string, AuthenticationError>> LoginAsync(LoginDto loginDto)
     {
         var user = await _userManager.Users
             .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
@@ -51,31 +51,16 @@ public class IdentityService : IIdentityService
         // The user not found in the database.
         if (user is null)
         {
-            return Result<string, AuthError>.Failure("Invalid credentials", AuthError.InvalidCredentials);
+            return new AuthenticationError(AuthError.InvalidCredentials, "Invalid credentials");
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
         if (result.Succeeded)
         {
-            return Result<string, AuthError>.Success(user.Id);
+            return user.Id;
         }
 
-        return Result<string, AuthError>.Failure("Invalid credentials", AuthError.InvalidCredentials);
+        return new AuthenticationError(AuthError.InvalidCredentials, "Invalid credentials");
     }
 }
-
-//    public async Task<Result<string>> GetCurrentUserAsync(ClaimsPrincipal user)
-//    {
-//        var currentUser = await _userManager.Users
-//            .FirstOrDefaultAsync(u => u.Email == user.FindFirstValue(ClaimTypes.Email));
-
-//        if (currentUser is null)
-//        {
-//            return Result<string>.Failure("No user found");
-//        }
-
-//        return Result<string>.Success("Ok");
-
-//    }
-//}

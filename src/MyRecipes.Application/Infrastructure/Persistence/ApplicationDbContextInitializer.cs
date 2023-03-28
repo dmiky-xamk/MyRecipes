@@ -8,7 +8,7 @@ using MyRecipes.Infrastructure.Identity;
 
 namespace MyRecipes.Infrastructure.Persistence;
 
-public class ApplicationDbContextInitializer
+public class ApplicationDbContextInitializer : IApplicationDbContextInitializer
 {
     private readonly ILogger<ApplicationDbContextInitializer> _logger;
     private readonly ApplicationDbContext _context;
@@ -42,7 +42,7 @@ public class ApplicationDbContextInitializer
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occured while initializing the database.");
+            _logger.LogError(ex, "An error occurred while initializing the database.");
         }
     }
 
@@ -54,7 +54,7 @@ public class ApplicationDbContextInitializer
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occured while seeding the database.");
+            _logger.LogError(ex, "An error occurred while seeding the database.");
         }
     }
 
@@ -98,7 +98,7 @@ public class ApplicationDbContextInitializer
             	PRIMARY KEY (id),
                 CONSTRAINT fk_recipe FOREIGN KEY(recipe_id) REFERENCES recipe(id) ON DELETE CASCADE);
             """;
-        
+
         var sqlDirection = """
                 CREATE TABLE IF NOT EXISTS direction ( 
             	id SERIAL,
@@ -125,15 +125,15 @@ public class ApplicationDbContextInitializer
                 UserId = userId,
                 Ingredients = new List<IngredientEntity>()
                 {
-                    new IngredientEntity("123", "Vettä", "dl", "2 1/2"),
-                    new IngredientEntity("123", "Kaurahiutaleita", "dl", "1"),
-                    new IngredientEntity("123", "Suolaa", "tl", "2"),
+                    new("123", "Vettä", "dl", "2 1/2"),
+                    new("123", "Kaurahiutaleita", "dl", "1"),
+                    new("123", "Suolaa", "tl", "2"),
                 },
                 Directions = new List<DirectionEntity>()
                 {
-                    new DirectionEntity("123", "Kiehauta vesi"),
-                    new DirectionEntity("123", "Lisää kaurahiutaleet"),
-                    new DirectionEntity("123", "Anna kiehua hitaasti kunnes mieleistä")
+                    new("123", "Kiehauta vesi"),
+                    new("123", "Lisää kaurahiutaleet"),
+                    new("123", "Anna kiehua hitaasti kunnes mieleistä")
                 }
             };
 

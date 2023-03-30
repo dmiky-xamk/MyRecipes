@@ -109,7 +109,7 @@ public static class ConfigureServices
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(opt =>
             {
-                opt.TokenValidationParameters = new()
+                opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     // What fields to validate in the token.
                     ValidateIssuerSigningKey = true,
@@ -123,8 +123,7 @@ public static class ConfigureServices
                         config.GetValue<string>("Authentication:SecretKey")))
                 };
             });
-
-        services.AddScoped<IApplicationDbContextInitializer, ApplicationDbContextInitializer>();
+        
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddScoped<ITokenService, TokenService>();
 

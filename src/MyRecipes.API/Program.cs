@@ -7,7 +7,6 @@ using MyRecipes.Infrastructure.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
 // TODO: Replace IConfiguration with IOptions.
-// TODO: Learn to write more tests.
 
 builder.Services.AddCors(opt =>
 {
@@ -23,7 +22,7 @@ builder.Services.AddCors(opt =>
 
 // Add services to the container.
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrasctuctureServices(builder.Configuration);
+builder.Services.AddInfrastructureServices();
 builder.Services.AddAPIServices(builder.Configuration);
 
 var app = builder.Build();

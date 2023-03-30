@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MyRecipes.Infrastructure.Persistence;
 using Npgsql;
 using System.Data.Common;
+using MyRecipes.Application.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
 
 namespace MyRecipes.API.IntegrationTests;
@@ -24,7 +25,7 @@ public sealed class CustomWebApplicationFactory
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-
+        
         builder.ConfigureAppConfiguration(configurationBuilder =>
         {
             var integrationConfig = new ConfigurationBuilder()
@@ -45,7 +46,13 @@ public sealed class CustomWebApplicationFactory
             var dbContextInitializerDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IApplicationDbContextInitializer));
             if (dbContextInitializerDescriptor is not null)
                 services.Remove(dbContextInitializerDescriptor);
+            
+            var connectionFactoryDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(IDbConnectionFactory));
+            if (connectionFactoryDescriptor is not null)
+                services.Remove(connectionFactoryDescriptor);
 
+            services.AddScoped<IDbConnectionFactory, TestDbConnectionFactory>(opt 
+                => new TestDbConnectionFactory(_postgreSqlContainer.GetConnectionString()));
             services.AddScoped<IApplicationDbContextInitializer, TestApplicationDbContextInitializer>();
             services.AddDbContext<ApplicationDbContext>(opt =>
             {

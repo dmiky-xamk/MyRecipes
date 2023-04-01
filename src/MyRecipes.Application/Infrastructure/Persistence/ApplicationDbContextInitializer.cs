@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Dapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyRecipes.Application.Entities;
+using MyRecipes.Application.Features.Recipes;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Domain.Entities;
 using MyRecipes.Infrastructure.Identity;
@@ -13,17 +15,20 @@ public class ApplicationDbContextInitializer : IApplicationDbContextInitializer
     private readonly ILogger<ApplicationDbContextInitializer> _logger;
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ICrud _db;
-    private readonly IDataAccess _dataAccess;
+    private readonly IRecipeRepository _recipeRepository;
+    private readonly IDbConnectionFactory _dbConnectionFactory;
 
-    public ApplicationDbContextInitializer(ILogger<ApplicationDbContextInitializer> logger,
-        ApplicationDbContext context, UserManager<ApplicationUser> userManager, ICrud db, IDataAccess dataAccess)
+    public ApplicationDbContextInitializer(
+        ILogger<ApplicationDbContextInitializer> logger,
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager,
+        IDbConnectionFactory dbConnectionFactory, IRecipeRepository recipeRepository)
     {
         _logger = logger;
         _context = context;
         _userManager = userManager;
-        _db = db;
-        _dataAccess = dataAccess;
+        _dbConnectionFactory = dbConnectionFactory;
+        _recipeRepository = recipeRepository;
     }
 
     public async Task InitializeAsync()
@@ -60,24 +65,33 @@ public class ApplicationDbContextInitializer : IApplicationDbContextInitializer
 
     private async Task TrySeedAsync()
     {
+        await CreateTestUser();
+        await CreateTables();
+        await CreateRecipesForTestUser();
+    }
+    
+    private async Task CreateTestUser()
+    {
         if (!_userManager.Users.Any())
         {
-            // Default user
-            ApplicationUser adminUser = new()
+            ApplicationUser testUser = new()
             {
                 UserName = "test@test.com",
                 Email = "test@test.com"
             };
 
-            if (_userManager.Users.All(u => u.Email != adminUser.Email))
+            if (_userManager.Users.All(u => u.Email != testUser.Email))
             {
-                await _userManager.CreateAsync(adminUser, "Test123");
+                await _userManager.CreateAsync(testUser, "Test123");
             }
 
             await _context.SaveChangesAsync();
         }
-
-        var sqlRecipe = """
+    }
+    
+    private async Task CreateTables()
+    {
+        var queryRecipeTable = """
                 CREATE TABLE IF NOT EXISTS recipe ( 
             	id Text NOT NULL,
             	name Text NOT NULL,
@@ -88,7 +102,7 @@ public class ApplicationDbContextInitializer : IApplicationDbContextInitializer
                 CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES "AspNetUsers"("Id"));
             """;
 
-        var sqlIngredient = """
+        var queryIngredientTable = """
                 CREATE TABLE IF NOT EXISTS ingredient ( 
             	id SERIAL,
             	name Text NOT NULL,
@@ -99,7 +113,7 @@ public class ApplicationDbContextInitializer : IApplicationDbContextInitializer
                 CONSTRAINT fk_recipe FOREIGN KEY(recipe_id) REFERENCES recipe(id) ON DELETE CASCADE);
             """;
 
-        var sqlDirection = """
+        var queryDirectionTable = """
                 CREATE TABLE IF NOT EXISTS direction ( 
             	id SERIAL,
             	step Text NOT NULL DEFAULT '',
@@ -108,12 +122,18 @@ public class ApplicationDbContextInitializer : IApplicationDbContextInitializer
                 CONSTRAINT fk_recipe FOREIGN KEY(recipe_id) REFERENCES recipe(id) ON DELETE CASCADE);
             """;
 
-        await _dataAccess.ExecuteStatement(sqlRecipe, new { });
-        await _dataAccess.ExecuteStatement(sqlIngredient, new { });
-        await _dataAccess.ExecuteStatement(sqlDirection, new { });
-
+        using (var connection = await _dbConnectionFactory.CreateConnectionAsync())
+        {
+            await connection.ExecuteAsync(queryRecipeTable);
+            await connection.ExecuteAsync(queryIngredientTable);
+            await connection.ExecuteAsync(queryDirectionTable);
+        }
+    }
+    
+    private async Task CreateRecipesForTestUser()
+    {
         var userId = _userManager.Users.First(u => u.Email == "test@test.com").Id;
-        var recipes = await _db.GetFullRecipesAsync(userId);
+        var recipes = await _recipeRepository.GetRecipesAsync(userId);
 
         if (!recipes.Any())
         {
@@ -137,9 +157,7 @@ public class ApplicationDbContextInitializer : IApplicationDbContextInitializer
                 }
             };
 
-            await _db.CreateRecipeAsync(recipe);
-            await _db.CreateIngredientsAsync(recipe.Ingredients);
-            await _db.CreateDirectionsAsync(recipe.Directions);
+            await _recipeRepository.CreateRecipeAsync(recipe);
         }
     }
 }

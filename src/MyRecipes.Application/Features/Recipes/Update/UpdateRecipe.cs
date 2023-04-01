@@ -3,8 +3,8 @@ using FluentValidation.Results;
 using IdGen;
 using MediatR;
 using MyRecipes.Application.Features.Auth;
+using MyRecipes.Application.Features.Recipes.Dtos;
 using MyRecipes.Application.Infrastructure.Persistence;
-using MyRecipes.Application.Recipes.Queries;
 using MyRecipes.Domain.Entities;
 using OneOf;
 using OneOf.Types;
@@ -21,15 +21,15 @@ public class UpdateRecipe
 
     public class Handler : IRequestHandler<Command, OneOf<QueryRecipeDto, ValidationResult, NotFound, Error<string>>>
     {
-        private readonly ICrud _db;
+        private readonly IRecipeRepository _recipeRepository;
         private readonly ICurrentUserService _userService;
         private readonly IValidator<RecipeDto> _validator;
 
-        public Handler(ICrud db, ICurrentUserService userService, IValidator<RecipeDto> validator)
+        public Handler(ICurrentUserService userService, IValidator<RecipeDto> validator, IRecipeRepository recipeRepository)
         {
-            _db = db;
             _userService = userService;
             _validator = validator;
+            _recipeRepository = recipeRepository;
         }
 
         public async Task<OneOf<QueryRecipeDto, ValidationResult, NotFound, Error<string>>> Handle(Command request, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ public class UpdateRecipe
 
             string userId = _userService.UserId!;
 
-            bool doesRecipeExist = await _db.CheckIfRecipeExists(request.Id, userId);
+            bool doesRecipeExist = await _recipeRepository.CheckIfRecipeExistsAsync(request.Id, userId);
             if (!doesRecipeExist)
             {
                 return new NotFound();
@@ -51,16 +51,12 @@ public class UpdateRecipe
 
             RecipeEntity recipe = request.Recipe.ToRecipeEntity(request.Id, userId);
 
-            int affectedRows = await _db.UpdateRecipeAsync(recipe);
-
-            if (affectedRows == 0)
+            bool isUpdateSuccess = await _recipeRepository.UpdateRecipeAsync(recipe);
+            if (!isUpdateSuccess)
             {
                 // Log
                 return new Error<string>("An unexpected error happened while updating your recipe.");
             }
-
-            await _db.UpdateIngredientsAsync(recipe.Ingredients, recipe.Id);
-            await _db.UpdateDirectionsAsync(recipe.Directions, recipe.Id);
 
             return recipe.ToQueryRecipeDto();
         }

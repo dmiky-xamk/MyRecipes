@@ -3,8 +3,8 @@ using FluentValidation.Results;
 using IdGen;
 using MediatR;
 using MyRecipes.Application.Features.Auth;
+using MyRecipes.Application.Features.Recipes.Dtos;
 using MyRecipes.Application.Infrastructure.Persistence;
-using MyRecipes.Application.Recipes.Queries;
 using MyRecipes.Domain.Entities;
 using OneOf;
 using OneOf.Types;
@@ -20,17 +20,17 @@ public class CreateRecipe
 
     public class Handler : IRequestHandler<Command, OneOf<QueryRecipeDto, ValidationResult, Error<string>>>
     {
-        private readonly ICrud _db;
+        private readonly IRecipeRepository _recipeRepository;
         private readonly IIdGenerator<long> _idGen;
         private readonly ICurrentUserService _userService;
         private readonly IValidator<RecipeDto> _validator;
 
-        public Handler(ICrud db, IIdGenerator<long> idGen, ICurrentUserService userService, IValidator<RecipeDto> validator)
+        public Handler(IIdGenerator<long> idGen, ICurrentUserService userService, IValidator<RecipeDto> validator, IRecipeRepository recipeRepository)
         {
-            _db = db;
             _idGen = idGen;
             _userService = userService;
             _validator = validator;
+            _recipeRepository = recipeRepository;
         }
 
         public async Task<OneOf<QueryRecipeDto, ValidationResult, Error<string>>> Handle(Command request, CancellationToken cancellationToken)
@@ -48,16 +48,12 @@ public class CreateRecipe
 
             RecipeEntity recipe = request.Recipe.ToRecipeEntity(recipeId, userId);
 
-            int affectedRows = await _db.CreateRecipeAsync(recipe);
-
-            if (affectedRows == 0)
+            bool isCreateSuccess = await _recipeRepository.CreateRecipeAsync(recipe);
+            if (!isCreateSuccess)
             {
                 // Log
                 return new Error<string>("An unexpected error happened while creating your recipe.");
             }
-
-            await _db.CreateIngredientsAsync(recipe.Ingredients);
-            await _db.CreateDirectionsAsync(recipe.Directions);
 
             return recipe.ToQueryRecipeDto();
         }

@@ -1,7 +1,4 @@
-﻿using MyRecipes.Application.Features.Recipes;
-using MyRecipes.Application.Ingredients;
-
-namespace MyRecipes.Application.Recipes.Queries;
+﻿namespace MyRecipes.Application.Features.Recipes.Dtos;
 
 public record QueryRecipeDto(
     string Id,

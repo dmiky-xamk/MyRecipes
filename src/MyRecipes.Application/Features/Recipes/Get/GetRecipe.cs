@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using MyRecipes.Application.Features.Auth;
+using MyRecipes.Application.Features.Recipes.Dtos;
 using MyRecipes.Application.Infrastructure.Persistence;
-using MyRecipes.Application.Recipes.Queries;
 using OneOf;
 using OneOf.Types;
 
@@ -16,20 +16,20 @@ public class GetRecipe
 
     public class Handler : IRequestHandler<Query, OneOf<QueryRecipeDto, NotFound>>
     {
-        private readonly ICrud _db;
+        private readonly IRecipeRepository _recipeRepository;
         private readonly ICurrentUserService _userService;
 
-        public Handler(ICrud db, ICurrentUserService userService)
+        public Handler(ICurrentUserService userService, IRecipeRepository recipeRepository)
         {
-            _db = db;
             _userService = userService;
+            _recipeRepository = recipeRepository;
         }
 
         public async Task<OneOf<QueryRecipeDto, NotFound>> Handle(Query request, CancellationToken cancellationToken)
         {
             string userId = _userService.UserId!;
 
-            var recipe = await _db.GetFullRecipeAsync(request.Id, userId);
+            var recipe = await _recipeRepository.GetRecipeAsync(request.Id, userId);
 
             if (recipe is null)
             {

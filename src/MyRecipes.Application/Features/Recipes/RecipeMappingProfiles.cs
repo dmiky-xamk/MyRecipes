@@ -1,6 +1,5 @@
 ﻿using MyRecipes.Application.Entities;
-using MyRecipes.Application.Ingredients;
-using MyRecipes.Application.Recipes.Queries;
+using MyRecipes.Application.Features.Recipes.Dtos;
 using MyRecipes.Domain.Entities;
 
 namespace MyRecipes.Application.Features.Recipes;
@@ -10,21 +9,22 @@ namespace MyRecipes.Application.Features.Recipes;
 // doing them manually is more explicit and let's me catch possible errors earlier.
 public static class RecipeMappingProfiles
 {
-    public static IngredientDto ToIngredientDto(this IngredientEntity ingredient)
+    private static IngredientDto ToIngredientDto(this IngredientEntity ingredient)
     {
         return new IngredientDto(ingredient.Name, ingredient.Unit, ingredient.Amount);
     }
 
-    public static IngredientEntity ToIngredientEntity(this IngredientDto ingredient, string recipeId)
+    private static IngredientEntity ToIngredientEntity(this IngredientDto ingredient, string recipeId)
     {
         return new IngredientEntity(recipeId, ingredient.Name.Trim(), ingredient.Unit.ToLower().Trim(), ingredient.Amount.Trim());
     }
-    
-    public static DirectionEntity ToDirectionEntity(this DirectionDto direction, string recipeId)
+
+    private static DirectionEntity ToDirectionEntity(this DirectionDto direction, string recipeId)
     {
         return new DirectionEntity(recipeId, direction.Step.Trim());
     }
-    public static DirectionDto ToDirectionDto(this DirectionEntity direction)
+
+    private static DirectionDto ToDirectionDto(this DirectionEntity direction)
     {
         return new DirectionDto(direction.Step);
     }

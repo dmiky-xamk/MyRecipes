@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
+using MyRecipes.Application.Features.Recipes.Dtos;
 using MyRecipes.Application.Infrastructure.Identity;
-using MyRecipes.Application.Recipes.Queries;
 using MyRecipes.Application.Users;
 using OneOf;
 

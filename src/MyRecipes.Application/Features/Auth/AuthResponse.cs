@@ -1,4 +1,4 @@
-﻿using MyRecipes.Application.Recipes.Queries;
+﻿using MyRecipes.Application.Features.Recipes.Dtos;
 
 namespace MyRecipes.Application.Users;
 

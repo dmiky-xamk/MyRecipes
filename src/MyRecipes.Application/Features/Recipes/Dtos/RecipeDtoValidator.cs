@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
-using MyRecipes.Application.Features.Recipes;
 
-namespace MyRecipes.Application.Recipes;
+namespace MyRecipes.Application.Features.Recipes.Dtos;
 
 // Validates the user input when creating a new recipe.
 public class RecipeDtoValidator :

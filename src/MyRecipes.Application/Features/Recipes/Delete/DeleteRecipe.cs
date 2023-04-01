@@ -15,28 +15,27 @@ public class DeleteRecipe
 
     public class Handler : IRequestHandler<Command, OneOf<Success, NotFound, Error<string>>>
     {
-        private readonly ICrud _db;
+        private readonly IRecipeRepository _recipeRepository;
         private readonly ICurrentUserService _userService;
 
-        public Handler(ICrud db, ICurrentUserService userService)
+        public Handler(ICurrentUserService userService, IRecipeRepository recipeRepository)
         {
-            _db = db;
             _userService = userService;
+            _recipeRepository = recipeRepository;
         }
 
         public async Task<OneOf<Success, NotFound, Error<string>>> Handle(Command request, CancellationToken cancellationToken)
         {
             string userId = _userService.UserId!;
 
-            bool doesRecipeExist = await _db.CheckIfRecipeExists(request.Id, userId);
+            bool doesRecipeExist = await _recipeRepository.CheckIfRecipeExistsAsync(request.Id, userId);
             if (!doesRecipeExist)
             {
                 return new NotFound();
             }
 
-            int affectedRows = await _db.DeleteRecipeAsync(request.Id, userId);
-
-            if (affectedRows == 0)
+            bool isDeleteSuccess = await _recipeRepository.DeleteRecipeAsync(request.Id, userId);
+            if (!isDeleteSuccess)
             {
                 // Log
                 return new Error<string>("An unexpected error happened while deleting your recipe.");

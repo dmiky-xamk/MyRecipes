@@ -17,12 +17,12 @@ public class CurrentUser
     public class Handler : IRequestHandler<Query, OneOf<AuthResponse, Error<string>>>
     {
         private readonly ICurrentUserService _userService;
-        private readonly ICrud _db;
+        private readonly IRecipeRepository _recipeRepository;
 
-        public Handler(ICurrentUserService currentUserService, ICrud db)
+        public Handler(ICurrentUserService currentUserService, IRecipeRepository recipeRepository)
         {
             _userService = currentUserService;
-            _db = db;
+            _recipeRepository = recipeRepository;
         }
 
         public async Task<OneOf<AuthResponse, Error<string>>> Handle(Query request, CancellationToken cancellationToken)
@@ -36,7 +36,7 @@ public class CurrentUser
                 return new Error<string>("Invalid token");
             }
 
-            var recipes = (await _db.GetFullRecipesAsync(userId))
+            var recipes = (await _recipeRepository.GetRecipesAsync(userId))
                 .Select(recipe => recipe.ToQueryRecipeDto());
 
             return new AuthResponse(token, email, recipes);

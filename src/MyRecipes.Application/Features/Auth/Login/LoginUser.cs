@@ -18,13 +18,13 @@ public class LoginUser
     {
         private readonly IIdentityService _identityService;
         private readonly ITokenService _tokenService;
-        private readonly ICrud _db;
+        private readonly IRecipeRepository _recipeRepository;
 
-        public Handler(IIdentityService identityService, ITokenService tokenService, ICrud db)
+        public Handler(IIdentityService identityService, ITokenService tokenService, IRecipeRepository recipeRepository)
         {
             _identityService = identityService;
             _tokenService = tokenService;
-            _db = db;
+            _recipeRepository = recipeRepository;
         }
 
         public async Task<OneOf<AuthResponse, AuthenticationError>> Handle(Query request, CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ public class LoginUser
                 async userId => {
                     var token = _tokenService.GenerateToken(request.LoginDto.Email, userId);
 
-                    var recipes = (await _db.GetFullRecipesAsync(userId))
+                    var recipes = (await _recipeRepository.GetRecipesAsync(userId))
                         .Select(recipe => recipe.ToQueryRecipeDto());
 
                     return new AuthResponse(token, request.LoginDto.Email, recipes);

@@ -1,6 +1,4 @@
-﻿using MyRecipes.Application.Ingredients;
-
-namespace MyRecipes.Application.Features.Recipes;
+﻿namespace MyRecipes.Application.Features.Recipes.Dtos;
 
 // Dto for when user creates a recipe.
 public record RecipeDto(

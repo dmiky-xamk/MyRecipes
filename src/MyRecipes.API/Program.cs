@@ -1,7 +1,7 @@
 using MyRecipes.API.Extensions;
 using MyRecipes.API.Mapping;
 using MyRecipes.Application;
-using MyRecipes.Infrastructure;
+using MyRecipes.Application.Infrastructure;
 using MyRecipes.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);

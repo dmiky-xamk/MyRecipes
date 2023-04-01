@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyRecipes.API.Mapping;
-using MyRecipes.Application.Features.Recipes;
 using MyRecipes.Application.Features.Recipes.Create;
 using MyRecipes.Application.Features.Recipes.Delete;
+using MyRecipes.Application.Features.Recipes.Dtos;
 using MyRecipes.Application.Features.Recipes.Get;
 using MyRecipes.Application.Features.Recipes.Update;
-using MyRecipes.Application.Recipes.Queries;
 
 namespace MyRecipes.API.Controllers.v1;
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Infrastructure.Persistence;
@@ -11,15 +12,15 @@ namespace MyRecipes.API.IntegrationTests;
 public class TestApplicationDbContextInitializer : IApplicationDbContextInitializer
 {
     private readonly ApplicationDbContext _context;
+    private readonly IDbConnectionFactory _connectionFactory;
     private readonly ILogger<TestApplicationDbContextInitializer> _logger;
-    private readonly IDataAccess _dataAccess;
 
     public TestApplicationDbContextInitializer(ILogger<TestApplicationDbContextInitializer> logger,
-        ApplicationDbContext context, IDataAccess dataAccess)
+        ApplicationDbContext context, IDbConnectionFactory connectionFactory)
     {
         _context = context;
+        _connectionFactory = connectionFactory;
         _logger = logger;
-        _dataAccess = dataAccess;
     }
 
     public async Task InitializeAsync()
@@ -43,7 +44,7 @@ public class TestApplicationDbContextInitializer : IApplicationDbContextInitiali
 
     private async Task CreateTables()
     {
-        var sqlRecipe = """
+        var queryRecipe = """
                 CREATE TABLE IF NOT EXISTS recipe (
             	id Text NOT NULL,
             	name Text NOT NULL,
@@ -54,7 +55,7 @@ public class TestApplicationDbContextInitializer : IApplicationDbContextInitiali
                 CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES "AspNetUsers"("Id"));
             """;
 
-        var sqlIngredient = """
+        var queryIngredient = """
                 CREATE TABLE IF NOT EXISTS ingredient (
             	id SERIAL,
             	name Text NOT NULL,
@@ -65,7 +66,7 @@ public class TestApplicationDbContextInitializer : IApplicationDbContextInitiali
                 CONSTRAINT fk_recipe FOREIGN KEY(recipe_id) REFERENCES recipe(id) ON DELETE CASCADE);
             """;
 
-        var sqlDirection = """
+        var queryDirection = """
                 CREATE TABLE IF NOT EXISTS direction (
             	id SERIAL,
             	step Text NOT NULL DEFAULT '',
@@ -74,8 +75,11 @@ public class TestApplicationDbContextInitializer : IApplicationDbContextInitiali
                 CONSTRAINT fk_recipe FOREIGN KEY(recipe_id) REFERENCES recipe(id) ON DELETE CASCADE);
             """;
 
-        await _dataAccess.ExecuteStatement(sqlRecipe, new { });
-        await _dataAccess.ExecuteStatement(sqlIngredient, new { });
-        await _dataAccess.ExecuteStatement(sqlDirection, new { });
+        using (var connection = await _connectionFactory.CreateConnectionAsync())
+        {
+            await connection.ExecuteAsync(queryRecipe);
+            await connection.ExecuteAsync(queryIngredient);
+            await connection.ExecuteAsync(queryDirection);
+        }
     }
 }

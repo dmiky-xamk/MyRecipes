@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using MyRecipes.API.IntegrationTests.Helpers;
-using MyRecipes.Application.Recipes.Queries;
 using System.Net.Http.Json;
+using MyRecipes.Application.Features.Recipes.Dtos;
 
 namespace MyRecipes.API.IntegrationTests.Controllers.v1.RecipesController;
 

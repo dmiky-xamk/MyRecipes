@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using MyRecipes.Application.Entities;
 using MyRecipes.Application.Features.Auth;
+using MyRecipes.Application.Features.Recipes;
 using MyRecipes.Application.Infrastructure.Persistence;
 using MyRecipes.Domain.Entities;
 using MyRecipes.Infrastructure.Identity;
@@ -43,7 +44,7 @@ public static class Utilities
         var scopeFactory = factory.Services.GetRequiredService<IServiceScopeFactory>();
         var scope = scopeFactory.CreateScope();
 
-        var db = scope.ServiceProvider.GetRequiredService<ICrud>();
+        var recipeRepository = scope.ServiceProvider.GetRequiredService<IRecipeRepository>();
 
         var recipe = new RecipeEntity()
         {
@@ -61,9 +62,7 @@ public static class Utilities
                 }
         };
 
-        await db.CreateRecipeAsync(recipe);
-        await db.CreateIngredientsAsync(recipe.Ingredients);
-        await db.CreateDirectionsAsync(recipe.Directions);
+        await recipeRepository.CreateRecipeAsync(recipe);
 
         return recipe;
     }

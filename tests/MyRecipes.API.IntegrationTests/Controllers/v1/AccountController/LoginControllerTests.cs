@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MyRecipes.API.IntegrationTests.Helpers;
 using MyRecipes.Application.Features.Auth.Login;
-using MyRecipes.Application.Recipes.Queries;
 using MyRecipes.Application.Users;
 using System;
 using System.Collections.Generic;

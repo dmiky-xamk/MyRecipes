@@ -1,7 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using MyRecipes.Application.Features.Recipes;
-using MyRecipes.Application.Ingredients;
-using MyRecipes.Application.Recipes;
+using MyRecipes.Application.Features.Recipes.Dtos;
 
 namespace MyRecipes.Application.UnitTests.Recipes.Validation;
 

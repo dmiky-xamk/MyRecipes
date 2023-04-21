@@ -2,7 +2,7 @@
 
 This personal project is a full-stack web application that enables users to manage and organize their favorite recipes. The application also features a recipe search functionality based on the ingredients that users have available. Developed with React and .NET, this project serves as a learning experience for implementing good practices and technologies in web development.
 
-* Azure DevOps + GitHub for CI/CD
+* Azure DevOps + GitHub for CI/CD & work items & boards
 * [Vertical Architecture](https://code-maze.com/vertical-slice-architecture-aspnet-core/) for the structure
 * JWTs & Identity for authentication
 * Restful API Controllers
@@ -30,6 +30,6 @@ The following pictures showcase some of the initial design concepts.
 <img src="https://user-images.githubusercontent.com/89644326/233551922-9e6c1c12-0cfe-442a-accf-4ffb4f8b1c26.png" width="700" height="370" />
 
 ## Azure DevOps CI/CD
-I have established a pipeline in Azure DevOps, ensuring that any changes made to the codebase are automatically tested, built, and published to GitHub. Additionally, I've also created a Heroku account to enable automatic deployment of those published changes. I can definetely see the benefit of adopting a CI/CD approach. By automating the testing and deployment process, the likelihood of introducing errors or inconsistencies is greatly reduced.
+I have established a pipeline in Azure DevOps, ensuring that any changes made to the codebase are automatically tested, built, and published to GitHub. Additionally, I've also created a Heroku account to enable automatic deployment of those published changes. I can definetely see the benefit of adopting a CI/CD approach. By automating the testing and deployment process, the likelihood of introducing errors or inconsistencies is greatly reduced. I've also taken advantage of work items and boards when developing by creating and assigning tasks for myself.
 
-![kuva](https://user-images.githubusercontent.com/89644326/233547338-8fa795f8-779b-4dec-8f54-cbc44dcb134c.png)
+<img src="https://user-images.githubusercontent.com/89644326/233547338-8fa795f8-779b-4dec-8f54-cbc44dcb134c.png" width="540" height="490" />

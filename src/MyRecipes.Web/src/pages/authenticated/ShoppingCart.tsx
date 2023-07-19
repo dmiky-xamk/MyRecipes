@@ -93,20 +93,23 @@ export default function ShoppingCart() {
       {/* ) : ( */}
       <Stack
         direction="row"
+        justifyContent="center"
         component="form"
         onSubmit={handleAddCartIngredient}
         gap={1}
         padding={1}
+        paddingBottom={8}
         sx={{
           position: "sticky",
           // bottom: (theme) => `calc(56px + ${theme.spacing(1)})`,
-          bottom: "56px",
+          // bottom: "56px",
+          bottom: "0px",
           backgroundColor: "#f7f7f7",
         }}
       >
         <RecipeEditTextField
           label="New ingredient"
-          sx={{ flex: 1 }}
+          sx={{ flex: 1, maxWidth: "md" }}
           value={ingredientValue}
           onChange={(e) => setIngredientValue(e.target.value)}
         />

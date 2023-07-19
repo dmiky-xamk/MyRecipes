@@ -20,7 +20,7 @@ import {
   RecipeErrorResponse,
 } from "../../features/recipes/recipe";
 import { FormHelperTextStyle } from "../../features/recipes/RecipeEditTextField";
-import RecipePlaceholderImage from "../../features/recipes/RecipePlaceholderImage";
+import RecipeImage from "./RecipeImage";
 
 const RecipeEditTextField = styled(TextField)({
   variant: "outlined",
@@ -137,7 +137,7 @@ export default function RecipeForm({ mutate, recipe }: Props) {
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-      {recipe?.image || <RecipePlaceholderImage />}
+      <RecipeImage src={recipe?.image} />
       <Stack padding={2} direction="column" gap={2}>
         <Stack gap={2}>
           <Controller
@@ -151,7 +151,7 @@ export default function RecipeForm({ mutate, recipe }: Props) {
               <RecipeEditTextField
                 {...field}
                 id="recipeName"
-                label="Recipe name"
+                label="Recipe name *"
                 error={
                   Boolean(errors?.recipeName) ||
                   Boolean(recipeError?.errors?.Name)
@@ -171,7 +171,7 @@ export default function RecipeForm({ mutate, recipe }: Props) {
               <RecipeEditTextField
                 {...field}
                 id="recipe-description"
-                label="Recipe description (optional)"
+                label="Recipe description"
               />
             )}
           />

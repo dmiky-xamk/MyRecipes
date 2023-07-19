@@ -1,9 +1,4 @@
-import {
-  QueryClient,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent, { ApiErrorResponse } from "../../api/agent";
 
 export interface Recipe {
@@ -104,7 +99,6 @@ const useCreateRecipe = () => {
   );
 };
 
-// TODO: Optimistic update?
 const useUpdateRecipe = () => {
   const queryClient = useQueryClient();
 
@@ -149,7 +143,55 @@ const useUpdateRecipe = () => {
     },
     onSettled: (recipe: Recipe | undefined) => {
       console.log("onSettled optimistic update");
+      console.log("Recipe:", recipe);
+
       queryClient.invalidateQueries(["recipes", recipe?.id]);
+    },
+  });
+};
+
+const useDeleteRecipe = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    Recipe,
+    RecipeErrorResponse,
+    string,
+    { previousRecipe: Recipe | undefined }
+  >((recipeId: string) => agent.Recipes.delete(recipeId), {
+    onMutate: async (deletedRecipeId) => {
+      await queryClient.cancelQueries({
+        queryKey: ["recipes", deletedRecipeId],
+      });
+
+      // Snapshot the previous value
+      const previousRecipe = queryClient.getQueryData<Recipe>([
+        "recipes",
+        deletedRecipeId,
+      ]);
+
+      // Optimistically remove the deleted recipe from the recipes data
+      // queryClient.setQueryData(["recipes", deletedRecipeId], undefined);
+      queryClient.setQueryData(["recipes"], (oldRecipes: any) =>
+        oldRecipes.filter((recipe: Recipe) => recipe.id !== deletedRecipeId)
+      );
+
+      // Return the previous recipes data as the rollback value
+      return { previousRecipe };
+    },
+    onError: (err, deletedRecipeId, context) => {
+      if (context?.previousRecipe) {
+        queryClient.setQueryData(
+          ["recipes", deletedRecipeId],
+          context.previousRecipe
+        );
+      }
+    },
+    onSettled: (data, error, deletedRecipeId) => {
+      // Timeout so that the navigation can complete first
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["recipes"] });
+      }, 500);
     },
   });
 };
@@ -173,4 +215,10 @@ const useUpdateRecipe = () => {
 //   return () => queryClient.setQueryData(["recipes"], previousItems);
 // }
 
-export { useRecipe, useRecipes, useCreateRecipe, useUpdateRecipe };
+export {
+  useRecipe,
+  useRecipes,
+  useCreateRecipe,
+  useUpdateRecipe,
+  useDeleteRecipe,
+};

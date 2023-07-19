@@ -1,4 +1,11 @@
-import { AppBar, Button, Stack, Toolbar } from "@mui/material";
+import {
+  AppBar,
+  Button,
+  Stack,
+  Theme,
+  Toolbar,
+  useMediaQuery,
+} from "@mui/material";
 import { Fragment } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
@@ -14,11 +21,16 @@ import Recipe from "./pages/authenticated/Recipe";
 import Search from "./pages/authenticated/Search";
 import ShoppingCart from "./pages/authenticated/ShoppingCart";
 import NotFound from "./pages/unauthenticated/NotFound";
+import { NavLink } from "react-router-dom";
 
 export default function AuthenticatedApp() {
   const { isLoading } = useRecipes();
   const navigate = useNavigate();
   const logout = useLogout({ onSuccess: () => navigate("/") });
+
+  const isSmallScreen = useMediaQuery((theme: Theme) =>
+    theme.breakpoints.down("sm")
+  );
 
   if (isLoading) {
     return (
@@ -32,9 +44,28 @@ export default function AuthenticatedApp() {
     <Stack flex={1}>
       <AppBar position="sticky" color="default">
         <Toolbar sx={{ justifyContent: "end" }}>
-          <Button color="inherit" onClick={() => logout.mutate()}>
-            Log out
-          </Button>
+          {isSmallScreen ? (
+            <Button color="inherit" onClick={() => logout.mutate()}>
+              Log out
+            </Button>
+          ) : (
+            <>
+              <Stack direction="row" flex={1} gap={2}>
+                <Button color="inherit" component={NavLink} to="/">
+                  Recipes
+                </Button>
+                <Button color="inherit" component={NavLink} to="search">
+                  Search
+                </Button>
+                <Button color="inherit" component={NavLink} to="cart">
+                  Cart
+                </Button>
+              </Stack>
+              <Button color="inherit" onClick={() => logout.mutate()}>
+                Log out
+              </Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
       {/* ErrorFallback has navigation built inside, but we still need to have 'onReset' to reset the error state. */}
@@ -53,7 +84,7 @@ export default function AuthenticatedApp() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </ErrorBoundary>
-      <BottomNav />
+      {isSmallScreen && <BottomNav />}
     </Stack>
   );
 }

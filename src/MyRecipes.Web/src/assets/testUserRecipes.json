@@ -1,0 +1,259 @@
+[
+  {
+    "id": "1",
+    "name": "Pancakes",
+    "description": "Delicious fluffy pancakes.",
+    "image": "pancakes.jpg",
+    "ingredients": [
+      {
+        "name": "Flour",
+        "unit": "g",
+        "amount": "200"
+      },
+      {
+        "name": "Milk",
+        "unit": "ml",
+        "amount": "250"
+      },
+      {
+        "name": "Egg",
+        "unit": "",
+        "amount": "1"
+      },
+      {
+        "name": "Sugar",
+        "unit": "g",
+        "amount": "20"
+      },
+      {
+        "name": "Baking Powder",
+        "unit": "g",
+        "amount": "10"
+      }
+    ],
+    "directions": [
+      {
+        "step": "In a mixing bowl, whisk together the flour, sugar, and baking powder."
+      },
+      {
+        "step": "In a separate bowl, beat the egg and mix it with the milk."
+      },
+      {
+        "step": "Pour the wet ingredients into the dry ingredients and stir until just combined."
+      },
+      {
+        "step": "Heat a non-stick pan over medium heat and pour the batter onto the pan to form pancakes."
+      },
+      {
+        "step": "Cook until bubbles form on the surface, then flip and cook until golden brown."
+      },
+      {
+        "step": "Serve with your favorite toppings and enjoy!"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Spaghetti Bolognese",
+    "description": "Classic Italian pasta dish with meat sauce.",
+    "image": "spaghetti-bolognese.jpg",
+    "ingredients": [
+      {
+        "name": "Ground Beef",
+        "unit": "g",
+        "amount": "300"
+      },
+      {
+        "name": "Onion",
+        "unit": "",
+        "amount": "1"
+      },
+      {
+        "name": "Garlic",
+        "unit": "clove",
+        "amount": "2"
+      },
+      {
+        "name": "Tomato Sauce",
+        "unit": "g",
+        "amount": "400"
+      },
+      {
+        "name": "Spaghetti",
+        "unit": "g",
+        "amount": "200"
+      },
+      {
+        "name": "Parmesan Cheese",
+        "unit": "g",
+        "amount": "50"
+      }
+    ],
+    "directions": [
+      {
+        "step": "Heat olive oil in a pan and sauté the chopped onion and minced garlic until fragrant."
+      },
+      {
+        "step": "Add the ground beef and cook until browned."
+      },
+      {
+        "step": "Pour in the tomato sauce and simmer for about 20 minutes."
+      },
+      {
+        "step": "Meanwhile, cook the spaghetti according to package instructions."
+      },
+      {
+        "step": "Once the sauce has thickened, season with salt and pepper to taste."
+      },
+      {
+        "step": "Serve the cooked spaghetti topped with the meat sauce and sprinkle with grated Parmesan cheese."
+      }
+    ]
+  },
+
+  {
+    "id": "3",
+    "name": "Chicken Curry",
+    "description": "A flavorful and aromatic chicken curry dish.",
+    "image": "chicken-curry.jpg",
+    "ingredients": [
+      {
+        "name": "Chicken Thighs",
+        "unit": "g",
+        "amount": "500"
+      },
+      {
+        "name": "Onion",
+        "unit": "",
+        "amount": "1"
+      },
+      {
+        "name": "Garlic",
+        "unit": "clove",
+        "amount": "3"
+      },
+      {
+        "name": "Ginger",
+        "unit": "thumb-sized piece",
+        "amount": "1"
+      },
+      {
+        "name": "Curry Powder",
+        "unit": "g",
+        "amount": "15"
+      },
+      {
+        "name": "Coconut Milk",
+        "unit": "ml",
+        "amount": "400"
+      },
+      {
+        "name": "Potato",
+        "unit": "",
+        "amount": "1"
+      }
+    ],
+    "directions": [
+      {
+        "step": "Heat oil in a pan and sauté the chopped onion, minced garlic, and grated ginger until fragrant."
+      },
+      {
+        "step": "Add the curry powder and cook for a minute to release its flavors."
+      },
+      {
+        "step": "Add the chicken thighs and cook until browned."
+      },
+      {
+        "step": "Stir in the coconut milk and simmer for about 20 minutes."
+      },
+      {
+        "step": "Add the diced potatoes and continue cooking until the chicken is cooked through and the potatoes are tender."
+      },
+      {
+        "step": "Serve the chicken curry with steamed rice or naan bread."
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "name": "Chocolate Chip Cookies",
+    "description": "Classic homemade chocolate chip cookies.",
+    "image": "chocolate-chip-cookies.jpg",
+    "ingredients": [
+      {
+        "name": "Butter",
+        "unit": "g",
+        "amount": "200"
+      },
+      {
+        "name": "Granulated Sugar",
+        "unit": "g",
+        "amount": "200"
+      },
+      {
+        "name": "Brown Sugar",
+        "unit": "g",
+        "amount": "200"
+      },
+      {
+        "name": "Eggs",
+        "unit": "",
+        "amount": "2"
+      },
+      {
+        "name": "Vanilla Extract",
+        "unit": "tsp",
+        "amount": "1"
+      },
+      {
+        "name": "All-Purpose Flour",
+        "unit": "g",
+        "amount": "300"
+      },
+      {
+        "name": "Baking Soda",
+        "unit": "tsp",
+        "amount": "1/2"
+      },
+      {
+        "name": "Salt",
+        "unit": "tsp",
+        "amount": "1/2"
+      },
+      {
+        "name": "Chocolate Chips",
+        "unit": "g",
+        "amount": "300"
+      }
+    ],
+    "directions": [
+      {
+        "step": "Preheat the oven to 350°F (180°C) and line a baking sheet with parchment paper."
+      },
+      {
+        "step": "In a mixing bowl, cream together the butter, granulated sugar, and brown sugar until light and fluffy."
+      },
+      {
+        "step": "Add the eggs one at a time, mixing well after each addition. Stir in the vanilla extract."
+      },
+      {
+        "step": "In a separate bowl, whisk together the flour, baking soda, and salt."
+      },
+      {
+        "step": "Gradually add the dry ingredients to the wet ingredients, mixing until just combined."
+      },
+      {
+        "step": "Fold in the chocolate chips."
+      },
+      {
+        "step": "Drop spoonfuls of cookie dough onto the prepared baking sheet, spacing them apart."
+      },
+      {
+        "step": "Bake for 10-12 minutes or until the edges are golden brown. Allow the cookies to cool on the baking sheet for a few minutes, then transfer them to a wire rack to cool completely."
+      },
+      {
+        "step": "Enjoy these delicious homemade chocolate chip cookies!"
+      }
+    ]
+  }
+]

@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { AuthCredentials, AuthResponse } from "../features/auth/auth";
 import { Recipe } from "../features/recipes/recipe";
+import { TestUserRecipes } from "./testUserApi";
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.headers.common["Content-Type"] = "application/json";
@@ -9,6 +10,15 @@ const responseBody = (response: AxiosResponse) => response.data;
 
 export const updateAxiosToken = (token: string | null) =>
   (axios.defaults.headers.common.Authorization = `Bearer ${token}`);
+
+// Use the test user API instead of the real API.
+export const enableTestUser = () => {
+  Recipes.list = TestUserRecipes.list;
+  Recipes.details = TestUserRecipes.details;
+  Recipes.update = TestUserRecipes.update;
+  Recipes.create = TestUserRecipes.create;
+  Recipes.delete = TestUserRecipes.delete;
+};
 
 export interface ApiErrorResponse {
   status: number;
@@ -50,7 +60,7 @@ const requests = {
   get: (url: string) => axios.get(url).then(responseBody),
   post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
   put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
-  delete: (url: string) => axios.post(url).then(responseBody),
+  delete: (url: string) => axios.delete(url).then(responseBody),
 };
 
 const Recipes = {
@@ -58,7 +68,9 @@ const Recipes = {
   details: (id: string): Promise<Recipe> => requests.get(`/recipes/${id}`),
   update: (id: string, recipe: Recipe) =>
     requests.put(`/recipes/${id}`, recipe),
-  create: (recipe: Recipe) => requests.post(`/recipes`, recipe),
+  create: (recipe: Recipe): Promise<Recipe> =>
+    requests.post(`/recipes`, recipe),
+  delete: (id: string) => requests.delete(`/recipes/${id}`),
 };
 
 const Account = {

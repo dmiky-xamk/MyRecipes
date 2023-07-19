@@ -5,8 +5,13 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import agent, { ApiErrorResponse, updateAxiosToken } from "../../api/agent";
+import agent, {
+  ApiErrorResponse,
+  enableTestUser,
+  updateAxiosToken,
+} from "../../api/agent";
 import { Recipe } from "../recipes/recipe";
+import testRecipes from "../../assets/testUserRecipes.json";
 
 export interface AuthCredentials {
   email: string;
@@ -139,4 +144,23 @@ const useUser = () => {
   return { user, isLoading, isError, error };
 };
 
-export { useUser, useLogin, useRegister, useLogout };
+const useTestUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<User>(async () => {
+    const testUserRecipes: Recipe[] = testRecipes;
+    const testUser: User = { email: "" };
+
+    queryClient.setQueryData(["authenticated-user"], testUser);
+    queryClient.setQueryData(["recipes"], testUserRecipes);
+    for (const recipe of testUserRecipes) {
+      queryClient.setQueryData(["recipes", recipe.id], recipe);
+    }
+
+    enableTestUser();
+
+    return testUser;
+  });
+};
+
+export { useUser, useTestUser, useLogin, useRegister, useLogout };

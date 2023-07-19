@@ -22,6 +22,17 @@ const theme = createTheme({
   typography: {
     fontFamily: ["Lato", "sans-serif"].join(","),
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          "&.active": {
+            color: "#ED6E06",
+          },
+        },
+      },
+    },
+  },
 });
 
 // Create a 'QueryClient' to set up default options for the caching.

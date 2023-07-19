@@ -77,7 +77,7 @@ export default function IngredientEditFields({
             <IngredientEditTextField
               {...field}
               id="ingredient-name"
-              label="Name"
+              label="Name *"
               sx={{ flex: "2 1 0" }}
               error={Boolean(errors?.fieldsArray?.[index]?.name)}
               helperText={errors?.fieldsArray?.[index]?.name?.message}

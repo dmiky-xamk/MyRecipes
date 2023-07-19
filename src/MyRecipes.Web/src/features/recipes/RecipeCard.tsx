@@ -1,4 +1,11 @@
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Theme,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import { Recipe } from "./recipe";
 
 interface Props {
@@ -6,14 +13,36 @@ interface Props {
 }
 
 export default function RecipeCard({ recipe }: Props) {
-  const { id, name, description, image, ingredients } = recipe;
+  const { name, description, image } = recipe;
+
+  const isSmallScreen = useMediaQuery((theme: Theme) =>
+    theme.breakpoints.down("sm")
+  );
+
+  const imageSrc = image
+    ? require(`../../assets/${image}`)
+    : require("../../assets/200.jpg");
 
   return (
-    <Card sx={{ display: "flex", maxHeight: 130, width: "100%" }}>
+    <Card
+      sx={
+        isSmallScreen
+          ? {
+              display: "flex",
+              maxHeight: 130,
+              width: "100%",
+            }
+          : {
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+            }
+      }
+    >
       <CardMedia
         component="img"
-        sx={{ width: 130 }}
-        image="https://via.placeholder.com/130" // {image}
+        sx={isSmallScreen ? { maxWidth: 130, height: 130 } : { height: 200 }}
+        image={imageSrc}
         alt="Recipe image"
       />
       <CardContent>
